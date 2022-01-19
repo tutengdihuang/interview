@@ -26,6 +26,7 @@
 - 什么是死锁？go什么情况会死锁？怎么避免死锁问题？
 
 - 字节对齐和大小端序
+    - [解答](https://www.yuque.com/docs/share/2f155ad2-4b48-415a-acf6-5ca11571d3db)
 - golang gc 操作系统不真实释放内存怎么办
 - map实现及底层原理？(sixin)
     - [go 设计与实现](https://draveness.me/golang/docs/part2-foundation/ch03-datastructure/golang-hashmap/#%E6%89%A9%E5%AE%B9)
@@ -125,37 +126,14 @@
 - slice的扩容规则（sixin）
 - gc 原理？三色法？混合写屏障？
 - 垃圾回收怎么检测阻塞
-## 区块链相关
-- 以太坊合约实现原理
-    - [refer](https://www.jianshu.com/p/72c4a0443d4e)
-    - 整理以太坊合约的原理
-
-- 非对称加密
-    - 签名
-    - 解签名
-
-- cosmos
-- 流言协议
-
-
-## 云原生
-
-- 在大规模集群下，怎么优化k8s集群
-- 非nodeport和lb的svc怎么暴露给外部集群
-- k8s内部都有哪些证书，是一样的么
-- k8s master都有哪些组件，可以随意部署么
-- prometheus的内部组件和抓取机制，以及
-- 大规模优化思路k8s多region方案
 
 
 
-## kafka
-- 卡夫卡topic消费不均匀导致性能抖动怎么办
 
 
-- kafka消费如何保证一致性
-    - 同一条消息来了两次
-    - 通过回掉函数，等mysql确认入库成功了，才确认是给kafka回复成功
+
+
+
 
 
 
