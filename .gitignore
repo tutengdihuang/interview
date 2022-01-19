@@ -1,26 +1,3 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
-# Test binary, build with `go test -c`
-*.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
-
 .idea/
-symbol/server/repository/mysql/build_table.go
 *.bak
 
-# build/run result
-main
-go.sum
-*log/
-cmd/trading-core/mock/actlist
-grpc/zmq/actlist
-backup/cfg/
-backup/db/
-actlist
