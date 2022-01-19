@@ -6,5 +6,5 @@
 - 干一份工作拿三份薪酬使我们的目的
 
 ## 加群
-- 微信: tutengdihuang
+- 群主微信: tutengdihuang
 
