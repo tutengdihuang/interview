@@ -117,7 +117,7 @@
     -
     - 如何解决ABA问题
         - 在变量前面加上版本号，每次变量更新的时候变量的版本号都+1，即A->B->A就变成了1A->2B->3A
-- mutuxex的原理
+- mutex的原理
     - [refer](https://www.processon.com/view/link/6078e4416376891132d67bcf)
 - GMP模型？全局队列没有g了，怎么办
     - 去其他p的g队列偷取
