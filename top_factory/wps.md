@@ -1,0 +1,17 @@
+## 001
+- 1	PHP-FPM
+- 2	CGI 是一个 Web Server 与 CGI 程序之间进行数据传输的协议，保证传递的是标准数据
+- 3	PHP-CGI 是 PHP 解析器（CGI 程序）
+- 4	FastCGI 是用来提高 CGI 程序性能的方案/协议。FastCGI 会先启动一个master，解析配置文件，初始化执行环境，然后再启动多个 worker。当请求过来时，master 会传递给一个worker，然后立即可以接收下一个请求，避免重复劳动，提高效率
+- 5	PHP-FPM 是实现 FastCGI 的程序
+- 6	PHP 和 Go 对比
+- 7	MVC 模式
+- 8	MySQL 优化（索引、分表分库）
+- 9	浏览器地址栏输入网址整个过程
+- 10	TCP 三次握手和四次挥手
+- 11	Linux 相关（介绍了一下基本操作命令）
+- 12	Docker 相关
+- 13	Git 相关
+- 14	开发环境（Windows、Linux）
+- 15	CI / CD 发布流程
+- 16	HTTP 长连接（HTTP 1.1 版本） 
