@@ -128,6 +128,46 @@
 - 垃圾回收怎么检测阻塞
 
 
+## 说出打印结果（探探）
+```go
+type query func(string) string
+
+func exec(name string, vs ...query) string {
+ ch := make(chan string)
+ fn := func(i int) {
+  ch <- vs[i](name)
+ }
+ for i, _ := range vs {
+  go fn(i)
+ }
+ return <-ch
+}
+
+func main() {
+ ret := exec("111", func(n string) string {
+  return n + "func1"
+ }, func(n string) string {
+  return n + "func2"
+ }, func(n string) string {
+  return n + "func3"
+ }, func(n string) string {
+  return n + "func4"
+ })
+ fmt.Println(ret)
+}
+```
+
+- 给出方法定义
+  - 实现 errgroup.Group
+  - 实现 singleflight.Group
+
+- [腾讯］使用golang实现一个端口监听的程序。
+
+- 内存对齐（from 不是山谷）
+  - [链接答案](https://www.yuque.com/docs/share/2f155ad2-4b48-415a-acf6-5ca11571d3db)
+  - [阅读2](https://mp.weixin.qq.com/s/H3399AYE1MjaDRSllhaPrw)
+
+
 
 
 
