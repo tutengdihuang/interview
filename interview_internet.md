@@ -93,3 +93,7 @@
         - RESTful规范把所有内容都视为资源，网络上一切皆资源
         - 可以完全通过 HTTP协议实现，使用 HTTP 协议处理数据通信
         - REST架构对资源的操作包括获取、创建、修改和删除资源的操作正好对应 HTTP协议提供的GET、POST、PUT和 DELETE方法
+- http 1.1 和http 2.0的区别
+- http etag请求头的作用
+- http1.1 保持长连接
+- https与http的区别

@@ -144,3 +144,10 @@
 - MVCC机制原理以及RR隔离级别下如何通过MVCC机制解决脏读，不可重复读，幻读的问题？
 - 事务还没提交的时候，redolog 能不能被持久化到磁盘呢(字节一面)
   - [解释参考](https://mp.weixin.qq.com/s/kdPb4v5nOu0LMCj8s1ETNg)
+
+- mysql 联合查询用法
+- mysql group用法
+- mysql group by  having 和 where 执行顺序
+- mysql 索引有哪些
+- mysql 主键索引和二级索引有什么区别
+- mysql 做过哪些优化

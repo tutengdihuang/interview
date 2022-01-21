@@ -10,6 +10,7 @@
         - 是什么
         - 有什么特性
         - 怎么用
+- go channel使用需要注意的地方
 - 如何主动关闭goroutine
 
 - goroutine和线程有什么区别
@@ -30,7 +31,8 @@
 - GO的GPM模型?P和M的数量怎么决定？如果在K8S容器部署，P和M又会有什么不同？
 
 - 什么是死锁？go什么情况会死锁？怎么避免死锁问题？
-
+- go sync包有哪些方法以及具体作用
+- go context包的作用
 - 字节对齐和大小端序
     - [解答](https://www.yuque.com/docs/share/2f155ad2-4b48-415a-acf6-5ca11571d3db)
 - golang gc 操作系统不真实释放内存怎么办
@@ -173,6 +175,10 @@ func main() {
   - [链接答案](https://www.yuque.com/docs/share/2f155ad2-4b48-415a-acf6-5ca11571d3db)
   - [阅读2](https://mp.weixin.qq.com/s/H3399AYE1MjaDRSllhaPrw)
 
+- 说说go语言的select机制？
+  - (1)、select机制用来处理异步IO问题
+  - (2)、select机制最大的一条限制就是每个case语句里必须是一个IO操作
+  - (3)、golang在语言级别支持select关键字
 
 
 
