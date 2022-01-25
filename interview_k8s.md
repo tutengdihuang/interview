@@ -6,3 +6,4 @@
 - k8s master都有哪些组件，可以随意部署么
 - prometheus的内部组件和抓取机制，以及
 - 大规模优化思路k8s多region方案
+## docker
