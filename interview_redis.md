@@ -52,5 +52,10 @@
 - redis 持久化有哪几种方式
   - [参考答案](https://cloud.tencent.com/developer/article/1442600)
 - redis 集群有哪几种
+<<<<<<< HEAD
   - [参考答案](https://juejin.cn/post/6844904178154897415)
+=======
+- redis怎么做高可用，机制
+- kafka的分区，备份等名词的概念，主分区和备份分区怎么保证消息一致，怎么保证消息不丢？
+>>>>>>> 5586e8c681861b3cd69eec9174ddf56e14517c0a
 	   
