@@ -363,3 +363,5 @@ func main()  {
 fmt.Println(x,y,z,k,p)
 }
 ```
+
+- slice和数组的区别
