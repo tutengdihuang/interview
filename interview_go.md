@@ -346,3 +346,20 @@ func main() {
 - 什么是耦合？
 - 什么是REST / RESTFUL 以及它的用途是什么
 - 什么是不同类型的微服务测试？
+- 如何设计一个熔断器
+- 下边的程序输出什么
+
+```go
+const (
+x = iota
+_
+y
+z = "zz"
+k
+p = iota
+)
+
+func main()  {
+fmt.Println(x,y,z,k,p)
+}
+```
