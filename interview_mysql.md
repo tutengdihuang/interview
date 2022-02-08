@@ -134,19 +134,47 @@
   - 答案：额外加一个status字段，0为正常，非零为已删除。和appid作为复合唯一索引，软删除的时候将status改为当前时间戳
 - mysql索引的类型，各自的特点，还有索引失效的情况
 - 腾讯外包公司题：
-  - mysql唯一索引是否可以为null？为什么？
+  - mysql唯一索引是否可以为null？为什么？、
+    - 允许存在的多个NULL值数据
   - select for update是表锁还是行锁？（仔细查找答案，有坑）
+    - 如果查询条件用了索引/主键，那么select ..... for update就会进行行锁。
+    - 如果是普通字段(没有索引/主键)，那么select ..... for update就会进行锁表。
   - 乐观锁和悲观锁数据库层面如何实现？
   - 缓存数据和数据库数据如何实现一致性？
 
 - 使用索引查询一定能提高查询的性能吗？为什么
-
-- MVCC机制原理以及RR隔离级别下如何通过MVCC机制解决脏读，不可重复读，幻读的问题？
+  - 不一定
+  - 索引需要额外的存储空间和处理,那些不必要的索引反而会使查询反应时间变慢.使用索引查询不一定能提高查询性能
 - 事务还没提交的时候，redolog 能不能被持久化到磁盘呢(字节一面)
   - [解释参考](https://mp.weixin.qq.com/s/kdPb4v5nOu0LMCj8s1ETNg)
 
 - mysql 联合查询用法
+  - INNER JOIN(等值连接) 只返回两个表中联结字段相等的行
+  - LEFT JOIN(左联接) 返回包括左表中的所有记录和右表中联结字段相等的记录
+  - RIGHT JOIN(右联接) 返回包括右表中的所有记录和左表中联结字段相等的记录
+  - SELECT * FROM 表1 INNER JOIN 表2 ON 表1.字段号=表2.字段号
+  - SELECT * FROM (表1 INNER JOIN 表2 ON 表1.字段号=表2.字段号) INNER JOIN 表3 ON 表1.字段号=表3.字段号
+  - SELECT * FROM ((表1 INNER JOIN 表2 ON 表1.字段号=表2.字段号) INNER JOIN 表3 ON 表1.字段号=表3.字段号) INNER JOIN 表4 ON Member.字段号=表4.字段号
 - mysql group用法
+  - group by语法可以根据给定数据列的每个成员对查询结果进行分组统计，最终得到一个分组汇总表
+    - 查询每个部门的总的薪水数
+    - SELECT DEPT, MAX(SALARY) AS MAXIMUM
+      FROM STAFF
+      GROUP BY DEPT
+  - 将 WHERE 子句与 GROUP BY 子句一起使用
+    - 查询公司2010年入职的各个部门每个级别里的最高薪水
+    - SELECT DEPT, EDLEVEL, MAX( SALARY ) AS MAXIMUM
+      FROM staff
+      WHERE HIREDATE > '2010-01-01'
+      GROUP BY DEPT, EDLEVEL
+      ORDER BY DEPT, EDLEVEL
+  - 在GROUP BY子句之后使用HAVING子句
+    - 寻找雇员数超过2个的部门的最高和最低薪水
+    - SELECT DEPT, MAX( SALARY ) AS MAXIMUM, MIN( SALARY ) AS MINIMUM
+      FROM staff
+      GROUP BY DEPT
+      HAVING COUNT( * ) >2
+      ORDER BY DEPT
 - mysql group by  having 和 where 执行顺序
 - mysql 索引有哪些
   - 1.普通索引
@@ -156,6 +184,8 @@
   - 5.全文索引
     - fulltext索引
 - mysql 主键索引和二级索引有什么区别
+  - mysql中每个表都有一个聚簇索引（clustered index ），除此之外的表上的每个非聚簇索引都是二级索引，又叫辅助索引（secondary indexes）
+  - 
 - mysql 做过哪些优化
   - SQL语句的优化
     - 尽量避免使用子查询
