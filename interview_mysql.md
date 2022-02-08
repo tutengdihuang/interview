@@ -120,13 +120,20 @@
 ## 自增id到了最大，再insert一条数据会发生什么？
 ## 从分组的结果中选出最大的5个数
 ## group和having的区别 
-## 千万条数据如何迁移
+- [refer](https://blog.csdn.net/u012106306/article/details/115009698?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164430198116780357225944%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164430198116780357225944&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-115009698.pc_search_insert_ulrmf&utm_term=group%E5%92%8Chaving%E7%9A%84%E5%8C%BA%E5%88%AB&spm=1018.2226.3001.4187)
+## live环境千万条数据如何迁移
+## live环境数据备份
+## live环境表格结构修改
+## live环境批量数据修改
+## live环境mysql主从同步 数据流失怎么办
 ## 什么是mysql
 ## 什么是b+树
+  - [refer](https://blog.csdn.net/xl_1803/article/details/113327698?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164430231516780265484124%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164430231516780265484124&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_ulrmf~default-1-113327698.pc_search_insert_ulrmf&utm_term=%E4%BB%80%E4%B9%88%E6%98%AFb%2B%E6%A0%91&spm=1018.2226.3001.4187)
 
 ## 2022-01-19收录
 - 你碰到过的数据库优化最难的问题，及如何解决
 - mysql 索引覆盖，回表 （滴滴）
+  - SQL只需要通过索引就可以返回查询所需要的数据，而不必通过二级索引查到主键之后再去查询数据
 - 忘了加唯一索引有啥补救措施吗
   - 只是参考答案：新增别出现相同数据就好
 - 在唯一索引的约束下，如何优雅地软删除
