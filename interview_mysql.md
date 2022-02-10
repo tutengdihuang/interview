@@ -265,6 +265,7 @@
     ![image](https://user-images.githubusercontent.com/31843331/152717888-d86e480a-b254-4461-bdf9-711f570d1e90.png)
   - 第五阶段：读写一段时间新表后，没有发生问题，可以停止写旧表
     ![image](https://user-images.githubusercontent.com/31843331/152718010-7916171b-432c-4a42-96c7-d25324c4b76f.png)
+  - [reference](https://developer.aliyun.com/article/782236)
 
 
 
