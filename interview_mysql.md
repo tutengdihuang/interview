@@ -109,7 +109,7 @@
     - 9、删除无用的索引，避免对执行计划造成负面影响； 以上是一些普遍的建立索引时的判断依据
 ## mysql的change buffer的作用？唯一索引，普通索引中用到？
 ## 查询很慢怎么排查和优化？
-- show full percesslist;
+- [refer](https://www.cnblogs.com/qmfsun/p/4844472.html)
 ## EXPLAIN有什么用途？有哪些字段？
 - 模拟Mysql优化器是如何执行SQL查询语句的，从而知道Mysql是如何处理你的SQL语句的。分析你的查询语句或是表结构的性能瓶颈
 - (一)id列：(1)、id 相同执行顺序由上到下
