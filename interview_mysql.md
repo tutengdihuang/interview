@@ -108,6 +108,35 @@
     - 8、频繁进行数据操作的表，不要建立太多的索引；
     - 9、删除无用的索引，避免对执行计划造成负面影响； 以上是一些普遍的建立索引时的判断依据
 ## mysql的change buffer的作用？唯一索引，普通索引中用到？
+
+~~~markdown
+mysql8.0 change buffer ： [源码说明](https://dev.mysql.com/doc/refman/8.0/en/innodb-change-buffer.html)
+	解释：change buffer 顾名思义是 ‘更改’缓存，就是对数据库 更改 动作的一个缓存，但是缓存的是那些不在buffer pool的二级索引页的一些MDL（insert update delete）操作的，随后当遇到一些相关其他的读操作，mysql会‘一起’将他们merge到buffer pool里，然后buffer pool里的内容会purge（清洗或者理解成flush）到disk存储中，当然也有定时任务会对change buffer 和 buffer pool的内容进行合并。和聚簇索引不一样，普通索引一般都不唯一，在业务中插入二级索引比较常见且顺序随机，删除和更新等操作很可能会影响那些相邻的二级索引页，稍后合并缓存的更改，当受影响的页面被其他操作读入缓冲池时，避免了将二级索引页面从磁盘读入缓冲池所需的大量随机访问 I/O。在系统大部分空闲或缓慢关闭期间运行的清除操作会定期将更新的索引页写入磁盘。与将每个值立即写入磁盘相比，purge操作可以更有效地为一系列索引值写入磁盘块。
+	
+	注意：官网原文：Change buffering is not supported for a secondary index if the index contains a descending index column or if the primary key includes a descending index column. 如果索引包含了降序索引列或者主键包含降序索引列，那就不支持使用change buffer了。这可能是排查问题的一个好点子，具体可查FAQ：https://dev.mysql.com/doc/refman/8.0/en/faqs-innodb-change-buffer.html
+	
+	特点（注意点）：
+		1. 虽然叫change buffer，实际上是可持久化的数据。即change buffer在内存中有拷贝，也会被写进磁盘（change buffer的操作也记录到redo log）
+		2. change buffer 只支持二级索引。聚簇，全文，空间索引都不支持，特别是全文索引，有他自己的缓存机制
+		3. change buffer是 buffer pool 的部分 5.6版本change buffer最多可以使用30%，5.6之后最多50%，默认是25%。change buffer不会一直存在，LRU算法会进行淘汰
+		4. 简单来说为了减少随机IO 的发生，change buffer适合应用在写多读少，该类业务模型常见为账单、日志类的系统。假设一业务的更新模式是写后马上查询，那么即使满足条件，将更新先记录在change buffer，但之后由于马上要访问该数据页，立即触发merge。这样随机访问IO的次数不会减少，反而增加change buffer维护代价。所以，对于这种业务模式，change buffer起反作用。
+		5. redo log 主要节省的是随机写磁盘的 IO 消耗（转成顺序写），而 change buffer 主要节省的则是随机读磁盘的 IO 消耗。
+		
+	作用：当操作更新一个数据页时
+		- 若数据页在内存（buffer pool），直接更新
+		- 若该数据页不在内存，在不影响数据一致性前提下，InooDB会将这些更新操作缓存在change buffer，无需从磁盘读入该数据页，在下次查询需要访问该数据页	    	   时，将数据页读入内存，然后执行change buffer中与这个页有关的操作。通过该方式就能保证这个数据逻辑的正确性。
+
+change buffer 和 二级索引、唯一索引有什么关系呢？
+	刚才上面提到了，change buffer本质还是为了提高性能的，基本都是涉及到了二级索引页的变更。那如果涉及到唯一索引呢？
+	对于唯一索引来说，所有的更新操作都要先判断这个操作是否违反唯一性约束！因此，这必须要将数据页读入内存才能判断。如果都已经读入到内存了，那直接更新内存会更快，就没必要使用 change buffer 了【没想到吧>._.<】。，唯一索引的更新就不能使用 change buffer，实际上也只有普通索引可以使用。
+
+
+~~~
+
+
+
+
+
 ## 查询很慢怎么排查和优化？
 - [refer](https://www.cnblogs.com/qmfsun/p/4844472.html)
 ## EXPLAIN有什么用途？有哪些字段？
