@@ -11,6 +11,8 @@
         - 有什么特性
         - 怎么用
 - go channel使用需要注意的地方
+  ![image](https://user-images.githubusercontent.com/31843331/153333030-3ca372b8-53c8-41db-ba86-ac89b9de636d.png)
+
 - 如何主动关闭goroutine
 
 - goroutine和线程有什么区别

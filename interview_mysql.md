@@ -109,20 +109,51 @@
     - 9、删除无用的索引，避免对执行计划造成负面影响； 以上是一些普遍的建立索引时的判断依据
 ## mysql的change buffer的作用？唯一索引，普通索引中用到？
 ## 查询很慢怎么排查和优化？
+- show full percesslist;
 ## EXPLAIN有什么用途？有哪些字段？
+- 模拟Mysql优化器是如何执行SQL查询语句的，从而知道Mysql是如何处理你的SQL语句的。分析你的查询语句或是表结构的性能瓶颈
+- (一)id列：(1)、id 相同执行顺序由上到下
+- (二)select_type列：数据读取操作的操作类型
+- (三)table列：该行数据是关于哪张表
+- (四)type列：访问类型由好到差system > const > eq_ref > ref > range > index > ALL
+- (五)possible_keys列：显示可能应用在这张表的索引，一个或者多个。查询涉及到的字段若存在索引，则该索引将被列出，但不一定被查询实际使用
+- (六)keys列：实际使用到的索引
+- (七)ken_len列：表示索引中使用的字节数，可通过该列计算查询中使用的索引长度
+- (八)ref列：显示索引的哪一列被使用了，如果可能的话，是一个常数
+- (九)rows列(每张表有多少行被优化器查询)
+- (十)Extra列：扩展属性，但是很重要的信息
 ## InnoDB索引底层实现？为什么使用b+树不适用b树？
 ## 什么是覆盖索引？什么是回表？
 ## MySQL的ACID怎么实现？
 ## 有哪些隔离级别？实现原理？
 ## 脏读、幻读概念？怎么解决幻读的问题？间隙锁是什么？可重复读怎么实现？
+- 脏读：事务A向表中插入了一条数据，此时事务A还没有提交，此时查询语句能把这条数据查询出来，这种现现象称为脏读；脏读比较好理解
+- 不可重复读：一个事务A第一次读取的结果之后，  另外一个事务B更新了A事务读取的数据，A事务在第二次读取的结果和第一次读取的结果不一样这种现象称为不可重复读
+- 幻读：事务A更新表里面的所有数据，这时事务B向表中插入了一条数据，这时事务A第一次的查询结果和第二次的查询结果不一致，这种现象我称为幻读
+- 间隙锁：当我们用范围条件而不是相等条件检索数据，并请求共享或排他锁时，InnoDB会给符合条件的已有数据记录的索引项加锁；对于键值在条件范围内但不存在的记录，叫做“间隙(GAP)”，InnoDB也会对这个“间隙”加锁，这种锁机制就是所谓的间隙锁(NEXT-KEY)锁
+  - 键值在条件范围内但不存在的记录，叫做“间隙(GAP)”，InnoDB也会对这个“间隙”加锁
+- 间隙锁的作用：1.防止幻读, 2.防止数据误删/改
 ## MySQL怎么实现高可用？
 ## 自增id到了最大，再insert一条数据会发生什么？
+- 产生主键冲突错误
+- 解决方法
+  - int-biging
+  - 分表，有效避免这个问题
+  - int类型设置为无符号的可以扩大一倍
 ## 从分组的结果中选出最大的5个数
+- select a.* from tb a where val in (select top 2 val from tb where name=a.name order by val desc) order by a.name,a.val
 ## group和having的区别 
 - [refer](https://blog.csdn.net/u012106306/article/details/115009698?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164430198116780357225944%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164430198116780357225944&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-115009698.pc_search_insert_ulrmf&utm_term=group%E5%92%8Chaving%E7%9A%84%E5%8C%BA%E5%88%AB&spm=1018.2226.3001.4187)
 ## live环境千万条数据如何迁移
 ## live环境数据备份
 ## live环境表格结构修改
+  - 执行时间
+    - 对于数据量较大的表，需要修改表结构，或者做一些耗时比较久的锁表操作，建议在晚上（业务闲时）执行
+  - 第一种方案
+    - 可以在变更表结构的命令中添加一个超时时间
+    - alter table practice.Student wait 100 add column Sheight int(4) not null default 0 comment "身高"
+  - 第二种方案
+    - http://blog.sina.com.cn/s/blog_4cb992270101ke0z.html
 ## live环境批量数据修改
 ## live环境mysql主从同步 数据流失怎么办
 ## 什么是mysql
