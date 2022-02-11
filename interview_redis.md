@@ -57,5 +57,8 @@
 - redis的删除策略
 - redis缓存穿透 如果用很多不存在的key攻击怎么办
     - 可以使用布隆过滤器，bitmap来实现
+  
+- redis sorted set score的范围是多少
+    - 65535
 
 
