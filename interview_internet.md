@@ -108,3 +108,12 @@
     - 第二次握手丢失了，会发生什么
         - 服务端会进入 SYN_RCVD 状态
         - 客户端就会触发超时重传机制，重传 SYN 报文，因为客户端就觉得可能自己的 SYN 报文（第一次握手）丢失了。
+
+- auth2权限认证
+    [reference](https://www.ruanyifeng.com/blog/2019/04/oauth-grant-types.html)
+- tcp怎么实现可靠的通信
+- tcp拥塞控制算？为什么需要拥塞避免？
+- cookie可以设置什么？
+    - http only ， domain ， key value，expire
+
+- 长连接和短连接

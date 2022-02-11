@@ -13,3 +13,5 @@
 - 虚拟化技术是什么
 - 什么是孤儿卷及如何删除它
 - docker为什么是轻量级别的
+- docker run -v
+- docker rm

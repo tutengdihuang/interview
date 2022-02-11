@@ -239,7 +239,7 @@ func main() {
 
 - 28.简单聊聊内存逃逸
 
-- 29.为sync.WaitGroup中Wait函数支持 WaitTimeout 功能.
+- 29.为什么sync.WaitGroup中Wait函数支持 WaitTimeout 功能.
 
 - 30.字符串转成byte数组，会发生内存拷贝吗？
 
@@ -372,3 +372,26 @@ fmt.Println(x,y,z,k,p)
 ```
 
 - slice和数组的区别
+- golang io.write的原理
+  ![image](https://user-images.githubusercontent.com/31843331/153559726-7a20134f-4dbd-4100-bb24-21ff774a4f45.png)
+
+- 账号系统怎么做认证的 session和cookie
+- 线上qps多少
+- 为什么用channel来控制协程数量，协程太多会timeout
+- 分配在栈上和分配在堆上有什么区别，分配在栈上有什么好处
+    - 参考：
+    - 栈的内存管理简单，分配比堆上快
+    - 栈的内存不需要回收，堆需要主动free
+    - 栈的内存访问有更好的局部性，堆上的访问速度比栈上的速度要慢
+
+- 怎么获取当前goroutine的数量，怎么获取当前goroutine的id
+    - run.NumGoroutines()
+    - goid 从runtime.stack上获取
+
+- 线程间的通信方式一般有哪几种锁
+- golang map[string]interface{}做形参能否传入，map[string]string
+- 单核goroutine中死循环，怎么调度出来
+- golang debug工具 性能分析
+- map深拷贝浅拷贝
+- 链表和数组的区别
+- grpc为什么高效
