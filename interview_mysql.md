@@ -35,14 +35,15 @@
     - 可重复读 解决不可重复读
     - 串行化    幻读
 - 如何解决不可重复读？
-    - mvcc（[查看mvcc的原理](https://processon.com/diagraming/61dec1c11e085306c9666fe9)）
+    - [查看mvcc的原理](https://www.processon.com/view/link/620b01c807912979960d3ac1)
+    - [查看mvcc的原理](https://www.processon.com/view/link/620b01d46376897c8c712c57)
 - mysql MVCC底层原理
 
 - 数据库什么情况下走索引，什么情况下不走索引
     - mysql认为全局遍历比走索引快的时候就会放弃索引，
     - 索引一般都是重复率低，或者不重复
     - 如果对性别只有男女进行索引，这种b+树只有一层，没必要走索引
-- 第一类索引，第二类索引
+- 第一类丢失更新，第二类丢失更新
     - 第一类丢失更新(回滚丢失，Lost update)，
         - A事务撤销时，把已经提交的B事务的更新数据覆盖了。
         - A事务在撤销时，“不小心”将B事务已经转入账户的金额给抹去了
@@ -327,6 +328,36 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
     ![image](https://user-images.githubusercontent.com/31843331/152718010-7916171b-432c-4a42-96c7-d25324c4b76f.png)
   - [reference](https://developer.aliyun.com/article/782236)
 
+
+- mysql update 语句执行流程
+  - [refer](https://processon.com/mindmap/60f6547e079129546fe40268)
+- redo undo,binlog  介绍下,
+  - redo log
+    - 将哪个数据页哪里发生了修改写入到redo log当中,而不需要将修改过的整个数据页刷到磁盘当中去
+    - 写redo log同样也是一次磁盘的写操作,凭什么说它的性能就更高一点呢
+      - 数据顺序写入redo log当中,这里其实就是一次顺序写磁盘的操作,
+      - 对于binlog来说一个修改操作可能会同时修改多个数据页,这些数据页又不是连续的,此时就意味着随机写磁盘
+      - 写redo log和刷数据页,写redo log是磁盘的顺序写,小数据量,而刷数据页到磁盘可能就意味着随机写,而且还是 大数据量的,两者一比较,写redo log的性能可能比刷数据页的性能高100倍
+      - 所以redo log 既能保证数据不丢失，也能保证了性能
+  - binlog
+    - Mysql binlog是二进制日志文件，用于记录mysql的数据更新或者潜在更新
+    - Row level
+    - Statement level（默认）
+    - Mixed（混合模式）
+  - undo log 
+    - undo log 是逻辑日志，用来提供回滚操作
+    - 指针链表，头指向最近的旧版本，尾部指向最早的版本
+  - relay log
+- mysql 半同步介绍下
+  - 主库只需要等待至少一个从节点，收到并且flush binlog到relay log文件即可，
+  - 主库不需要等待所有从库给主库反馈，这里只是一个收到的反馈，而并不是从库已经完成并提交的反馈，
+  - 即从库只应用完成io_thread内容即可无需等到sql_thread的执行完成
+- mysql 事务原子性怎么实现的
+- 分库分表策略
+- 分表键和查询条件不一致咋整
+  - [refer](https://www.processon.com/view/link/620af9b50e3e7429dd02be21)
+- 缓存和数据库的一致性怎么保证,当不一致的时候如何解决
+  - [refer](https://www.processon.com/view/link/620af9b50e3e7429dd02be21)
 
 
 

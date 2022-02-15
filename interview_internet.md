@@ -117,3 +117,4 @@
     - http only ， domain ， key value，expire
 
 - 长连接和短连接
+- 网络攻击,ddos攻击, 半连接攻击

@@ -61,4 +61,10 @@
 - redis sorted set score的范围是多少
     - (-2^53---- +2^53)
 
+- redis数据结构, sort set 底层实现
+    -     - [refer](https://processon.com/mindmap/60c09f127d9c087937196f50)
+- redis 内存优化相关的设计
+- 秒杀,促销设计
+    - [refer](https://processon.com/mindmap/60f43a4c7d9c087bac5cd26f)
+
 
