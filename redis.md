@@ -6,11 +6,13 @@
 ## redis常用的数据结构
 ## redis的zset实现
 ## Redis缓存淘汰策略
+- [reference](https://www.processon.com/view/link/620b45476376897c8c7239d0)
 ## Redis主从复制原理
+- [reference](https://www.processon.com/view/link/620b4875f346fb617416aed3)
 ## Redis怎么实现高可用
-
+- [reference](https://www.processon.com/view/link/620b48f17d9c0807ec8cf49a)
 ## redis缓存雪崩、缓存穿透、缓存击穿
-    - [refer](https://www.processon.com/view/link/61e648387d9c0806a8b0cf29)
+- [reference](https://www.processon.com/view/link/61e648387d9c0806a8b0cf29)
 
 ## redis string的编码方式
     - int 编码：保存long 型的64位有符号整数
@@ -52,7 +54,6 @@
 - redis 持久化有哪几种方式
 - redis 集群有哪几种，redis集群怎么实现高可用
 - redis怎么做高可用，机制
-- kafka的分区，备份等名词的概念，主分区和备份分区怎么保证消息一致，怎么保证消息不丢？
 - 怎么保证redis和mysql的数据一致性
 - redis的删除策略
 - redis缓存穿透 如果用很多不存在的key攻击怎么办
@@ -66,5 +67,9 @@
 - redis 内存优化相关的设计
 - 秒杀,促销设计
     - [refer](https://processon.com/mindmap/60f43a4c7d9c087bac5cd26f)
+
+- redis如何保证lua脚本的一致性
+    - 原子操作：Redis会将整个脚本作为一个整体执行，中间不会被其他进程或者进程的命令插入
+    - [reference](https://segmentfault.com/a/1190000019676878)
 
 
