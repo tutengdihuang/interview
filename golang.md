@@ -38,8 +38,6 @@
 - 字节对齐和大小端序
     - [解答](https://www.yuque.com/docs/share/2f155ad2-4b48-415a-acf6-5ca11571d3db)
 - golang gc 操作系统不真实释放内存怎么办
-- map实现及底层原理？(sixin)
-    - [go 设计与实现](https://draveness.me/golang/docs/part2-foundation/ch03-datastructure/golang-hashmap/#%E6%89%A9%E5%AE%B9)
 - context原理
 - single—flight实现原理
 - 延迟队列
@@ -68,8 +66,7 @@
     - 可扩展
     - 可伸缩
 
-- 如何手动设计一个map
-- 有一个写多读少的场景，怎么设计高性能map
+
 - 两个客户端A,B A读取数据，B修改还未提交，A再次读取，A两次读取的消息是一致的吗？
 - grpc 版本字段增加，服务端客户端如何升级？先后顺序是什么
     - 先升级服务端，后升级客户端
@@ -111,13 +108,12 @@
 - go中哪些是值类型，哪些是引用类型
     - 引用类型：指针，map，slice，channel，方法与函数
     - 值类型：int系列、float系列、bool、string、数组和结构体
-- sync map的原理
-    - [refer](https://blog.csdn.net/weixin_42663840/article/details/107958274)
+
 - 值传递和引用传递的区别
     - golang中只有值传递
 - 切片传递过去，如果被调用函数append()，原来的切片会不会变化
     - append会修改slice所使用的底层数组，如果数组的不需要扩容会影响原来的切片；如果扩容则会引用新的数组，不会影响原切片；
-- map 锁+map sync.map concurrentmap的区别
+
 
 - 如何确认二个map是否相等
     - reflect.DeepEqual(c1, c2)，可以是map，slice，struct
@@ -399,6 +395,18 @@ fmt.Println(x,y,z,k,p)
 - golang map[string]interface{}做形参能否传入，map[string]string
 - 单核goroutine中死循环，怎么调度出来
 - golang debug工具 性能分析
-- map深拷贝浅拷贝
+
 - 链表和数组的区别
 - grpc为什么高效
+
+## map + sync map
+- map深拷贝浅拷贝
+- slice和map的扩容机制，map扩容时读数据怎么处理的
+- map实现及底层原理？(sixin)
+    - [go 设计与实现](https://draveness.me/golang/docs/part2-foundation/ch03-datastructure/golang-hashmap/#%E6%89%A9%E5%AE%B9)
+- 如何手动设计一个map
+- 有一个写多读少的场景，怎么设计高性能map
+- map 锁+map sync.map concurrentmap的区别
+- sync map的原理
+    - [refer1](https://blog.csdn.net/weixin_42663840/article/details/107958274)
+    - [refer2](https://blog.csdn.net/u011957758/article/details/96633984?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164515668616781683951530%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164515668616781683951530&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-96633984.pc_search_result_positive&utm_term=golang+syncmap&spm=1018.2226.3001.4187)

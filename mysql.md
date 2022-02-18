@@ -359,5 +359,24 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 - 缓存和数据库的一致性怎么保证,当不一致的时候如何解决
   - [refer](https://www.processon.com/view/link/620af9b50e3e7429dd02be21)
 
+- innodb是如何存储数据的
+  - [refer](https://mp.weixin.qq.com/s/665zAn_PuTqAl_rJa_5Ilg)
+
+- mysql explain 各种字段的含义
+
+- redolog 罗盘
+  - https://blog.csdn.net/weixin_40471676/article/details/119732738
+
+- mysql主备如何保证数据同步 
+  - https://www.processon.com/view/link/620f131c1efad406e7332e92
+
+- show processlist 命令详解 
+  - https://blog.csdn.net/dhfzhishi/article/details/81263084
+
+- 如何判断数据库是否出问题了 
+  - https://www.processon.com/view/link/620f17ce6376897c8c7bce60
+
+- mysql group by having 和 where 执行顺序 
+  - 先执行where 再执行 group by 再执行 having
 
 

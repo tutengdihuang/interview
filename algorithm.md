@@ -53,3 +53,5 @@ return root
 ```
 
 - hash一致性
+- https://mp.weixin.qq.com/s/dpwC4TAAO1CdlPWIC_KFUg
+- 算法题，最长连续子数组，输入[1,2,3,7,8,9,10]，返回4，最长连续的的是7,8,9,10

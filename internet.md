@@ -94,9 +94,12 @@
         - 可以完全通过 HTTP协议实现，使用 HTTP 协议处理数据通信
         - REST架构对资源的操作包括获取、创建、修改和删除资源的操作正好对应 HTTP协议提供的GET、POST、PUT和 DELETE方法
 - http 1.1 和http 2.0的区别
+    - [http 1.1 和http 2.0的区别](https://www.cnblogs.com/heluan/p/8620312.html)   
 - http etag请求头的作用
 - http1.1 保持长连接
+    - [http1.1 保持长连接](https://blog.csdn.net/xiaoduanayu/article/details/78386508)
 - https与http的区别
+    - - [https与http的区别](https://www.cnblogs.com/wqhwe/p/5407468.html)
 - 滑动窗口的概念以及应用?
 - 三次握手四次挥手过程
 - mysql一个表有时间，用户，消息字段要求查每个用户最新一条消息

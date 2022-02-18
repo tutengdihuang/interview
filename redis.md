@@ -81,5 +81,9 @@
 - redis主动下线被动下线 
 - redis复制延迟 
 - redis的故障恢复
+- redis cluster 集群中突然宕机了一台服务器会发生什么
+- redis cluster 中为什么要用crc16算法 而不用哈希一致性算法？
+- redis哨兵集群中有服务挂掉，哨兵会做哪些事？
+- 热key的探测方案？
 
 
