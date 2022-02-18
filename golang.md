@@ -30,6 +30,8 @@
     - 上下文切换成本小
     - goroutine GMP模型，M：N模型
     - 如果可以聊聊goroutine的生老病死
+- goroutine切换的原理
+    - 网络io阻塞主动切换，cpu占用时间过长信号切换，锁，channel
 - GO的GPM模型?P和M的数量怎么决定？如果在K8S容器部署，P和M又会有什么不同？
 
 - 什么是死锁？go什么情况会死锁？怎么避免死锁问题？
@@ -410,3 +412,4 @@ fmt.Println(x,y,z,k,p)
 - sync map的原理
     - [refer1](https://blog.csdn.net/weixin_42663840/article/details/107958274)
     - [refer2](https://blog.csdn.net/u011957758/article/details/96633984?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164515668616781683951530%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164515668616781683951530&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-96633984.pc_search_result_positive&utm_term=golang+syncmap&spm=1018.2226.3001.4187)
+

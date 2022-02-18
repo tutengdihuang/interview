@@ -387,3 +387,7 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 
 - 如何优化mysql
   - [refer](https://mp.weixin.qq.com/s/0byIHkrQm18rGtPPXxgnkQ)
+- mysql慢查询如何优化，有哪些手段，
+- mysql事物回滚过程说一下，越详细越好
+- 假如每天有100万数据放进来，又要支持查询功能，有什么优化方式吗？
+- 分表通过哪些指标分表？
