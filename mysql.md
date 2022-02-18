@@ -302,6 +302,7 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
       - 尽量避免子查询，而用join
       - 在组合索引中，将有区分度的索引放在前面
       - 避免在 where 子句中对字段进行 null 值判断
+      - [失效场景](https://mp.weixin.qq.com/s/nnwXug8EaLiIl4UIAElvMQ)
 - 相对B树，B+树做索引的优势
   - B+树的磁盘读写代价更低
     - B+树的内部节点并没有指向关键字具体信息的指针，因此其内部节点相对B树更小
@@ -380,3 +381,9 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
   - 先执行where 再执行 group by 再执行 having
 
 
+- clickhouse的分布式是怎么工作的
+- where a and b and c , abc 谁先执行
+  - 当联合索引的列都出现在查询条件中时，查询条件的顺序不影响
+
+- 如何优化mysql
+  - [refer](https://mp.weixin.qq.com/s/0byIHkrQm18rGtPPXxgnkQ)
