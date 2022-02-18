@@ -20,7 +20,36 @@
 - 快排
 - 堆排序
 - 一个随机数生成器只有0和1 生成概率为p和1-p，要写一个随机数生成器，生成1和0的概率都为1/2
-- 写程序反转链表 ac
+- 写程序反转链表 
 - 限流算法
 - 算法 将k个长度为n的有序数组排序
 - 二叉搜索树顺序输出
+- 二叉树镜像
+```go
+输入：
+4
+/
+2 7
+/ \ /
+1 3 6 9
+
+输出：
+4
+/
+7 2
+/ \ /
+9 6 3 1
+func invertTree(root *TreeNode) *TreeNode {
+if root == nil {
+return nil
+}
+
+root.Left, root.Right = root.Right, root.Left
+invertTree(root.Left)
+invertTree(root.Right)
+
+return root
+}
+```
+
+- hash一致性
