@@ -56,3 +56,4 @@ return root
 - https://mp.weixin.qq.com/s/dpwC4TAAO1CdlPWIC_KFUg
 - 算法题，最长连续子数组，输入[1,2,3,7,8,9,10]，返回4，最长连续的的是7,8,9,10
 - 算法题： 生成一个随机数组，然后写一个nlogn的排序算法，然后写个二分搜索验证你排序的结果
+- 两个gorouite 交替打印奇偶数
