@@ -416,3 +416,4 @@ range方案：不需要迁移数据，但有热点问题。
 - innodb宕机恢复时候的配置问题
   - 详细见 mysql 技术内幕 innodb存储引擎
 - mysqlpage 了解吗？作用是什么？innodb怎么使用？做了哪些优化（结合innodb的特性）
+- b+树是如何减少io的相对于b树
