@@ -319,15 +319,17 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
   - 第二种方式 MVCC+next-key locks：next-key locks由record locks(索引加锁) 和 gap locks(间隙锁，每次锁住的不光是需要使用的数据，还会锁住这些数据附近的数据)
 - 如何对数据库进行分库分表，不允许停止服务
   - 第一阶段： 编写代理层和DAO层，代理层动态开关，决定写的是新表还是旧表，此时流量仍然是访问旧表
-    ![image](https://user-images.githubusercontent.com/31843331/152716838-883162bd-cdaf-4d01-b2ef-74b34d8099e4.png)
+    - <img src="https://user-images.githubusercontent.com/31843331/152716838-883162bd-cdaf-4d01-b2ef-74b34d8099e4.png" width = "300" height = "300" alt="图片名称" />
   - 第二阶段： 开启双写，增量数据同时在旧表和新表进行新增和修改，日志或者临时表写入新表id的起始值，旧表中小于这个id值的数据就是存量数据
-    ![image](https://user-images.githubusercontent.com/31843331/152717372-ddb80d3e-3746-4a67-960f-3ecf1c86d497.png)
+    - <img src="https://user-images.githubusercontent.com/31843331/152717372-ddb80d3e-3746-4a67-960f-3ecf1c86d497.png" width = "300" height = "300" alt="图片名称" />
   - 第三阶段：进行增量数据同步，通过脚本通过分页将存量数据同步到新库
-    ![image](https://user-images.githubusercontent.com/31843331/152717509-b4a82a9d-789a-4774-b3ea-0ac5cbb2929c.png)
+    - <img src="https://user-images.githubusercontent.com/31843331/152717509-b4a82a9d-789a-4774-b3ea-0ac5cbb2929c.png" width = "300" height = "300" alt="图片名称" />
+
   - 第四阶段： 停读旧表，改读新表，此时新表已经承担了所有读写业务，但是不能停止写旧表，需要双写一段时间
-    ![image](https://user-images.githubusercontent.com/31843331/152717888-d86e480a-b254-4461-bdf9-711f570d1e90.png)
+    - <img src="https://user-images.githubusercontent.com/31843331/152717888-d86e480a-b254-4461-bdf9-711f570d1e90.png" width = "300" height = "300" alt="图片名称" />
+
   - 第五阶段：读写一段时间新表后，没有发生问题，可以停止写旧表
-    ![image](https://user-images.githubusercontent.com/31843331/152718010-7916171b-432c-4a42-96c7-d25324c4b76f.png)
+    - <img src="https://user-images.githubusercontent.com/31843331/152718010-7916171b-432c-4a42-96c7-d25324c4b76f.png" width = "300" height = "300" alt="图片名称" />
   - [reference](https://developer.aliyun.com/article/782236)
 
 

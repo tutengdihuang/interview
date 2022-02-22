@@ -88,5 +88,7 @@
 - redis 大量key过期，但是内存不释放？
   - 淘汰策略为懒淘汰，修改淘汰策略
 - redis内存很多碎片，导致内存居高不下，如何解决？
+- 为啥RedisCluster设计成16384个槽
+  - [refer](https://zhuanlan.zhihu.com/p/99037321)
 
 

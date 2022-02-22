@@ -187,7 +187,6 @@ func main() {
   - (1)、select机制用来处理异步IO问题
   - (2)、select机制最大的一条限制就是每个case语句里必须是一个IO操作
   - (3)、golang在语言级别支持select关键字
-- 题目：已知方法 curl  要求实现  MutilCurl 能够制定并发请求数量，并返回请求错误
   
 - 1.项目中用到的锁
 
@@ -412,4 +411,6 @@ fmt.Println(x,y,z,k,p)
 - sync map的原理
     - [refer1](https://blog.csdn.net/weixin_42663840/article/details/107958274)
     - [refer2](https://blog.csdn.net/u011957758/article/details/96633984?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164515668616781683951530%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164515668616781683951530&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-96633984.pc_search_result_positive&utm_term=golang+syncmap&spm=1018.2226.3001.4187)
+- Go 如何高效地拼接字符串 ?
+
 
