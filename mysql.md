@@ -190,7 +190,9 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 ## 什么是mysql
 ## 什么是b+树
   - [refer](https://blog.csdn.net/xl_1803/article/details/113327698?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164430231516780265484124%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164430231516780265484124&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_ulrmf~default-1-113327698.pc_search_insert_ulrmf&utm_term=%E4%BB%80%E4%B9%88%E6%98%AFb%2B%E6%A0%91&spm=1018.2226.3001.4187)
-
+  - b树的缺点
+    - 当进行范围查找时，存在回旋查找的问题
+    - 排序的时候，需要进行一次中序遍历（order by）
 ## 2022-01-19收录
 - 你碰到过的数据库优化最难的问题，及如何解决
 - mysql 索引覆盖，回表 （滴滴）
