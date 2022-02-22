@@ -154,6 +154,15 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 - (九)rows列(每张表有多少行被优化器查询)
 - (十)Extra列：扩展属性，但是很重要的信息
 ## InnoDB索引底层实现？为什么使用b+树不适用b树？
+- [refer](https://blog.csdn.net/weixin_38054045/article/details/114024721?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164551017416780265482140%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=164551017416780265482140&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-2-114024721.pc_search_result_positive&utm_term=%E4%B8%BA%E4%BB%80%E4%B9%88b%2B%E6%A0%91%E5%87%8F%E5%B0%8F%E4%BA%86io&spm=1018.2226.3001.4187)
+- B+ 树的非叶子节点上只储存键值，而 B 树的非叶子节点上不仅储存键值还储存数据。
+- 在 MySQL 数据库中数据页的大小是固定的，Innodb 引擎数据页默认大小为 16 KB。
+- B+ 树这种做法是为了让树的阶数更大，让树更矮胖。
+- 进行查询的时候，磁盘 IO 次数就会减少，查询效率也会更快。
+- B+ 树的所有数据均储存在叶子节点中，并且是按键值有序排列。
+- 但是 B 树的数据分散在各个节点。进行范围查询，排序查询的时候，B 树的效率肯定不如 B+ 树
+## 为什么b+树减少了io
+- 见上一题
 ## 什么是索引？什么是回表？
 ## MySQL的ACID怎么实现？
 ## 有哪些隔离级别？实现原理？
