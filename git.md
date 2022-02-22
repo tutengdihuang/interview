@@ -1,3 +1,5 @@
 - 如何修改已经提交的comment
 - git 如何查看文件
 - git 工作区和暂存区的区别 head 是什么
+- git rebase
+- git push 与git fetch的区别
