@@ -435,4 +435,9 @@ range方案：不需要迁移数据，但有热点问题。
 - innodb宕机恢复时候的配置问题
   - 详细见 mysql 技术内幕 innodb存储引擎
 - mysqlpage 了解吗？作用是什么？innodb怎么使用？做了哪些优化（结合innodb的特性）
+  - [refer](https://blog.csdn.net/duanxiaobin2010/article/details/80896257?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164560172516780271948098%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164560172516780271948098&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-80896257.pc_search_result_positive&utm_term=mysql+page&spm=1018.2226.3001.4187)
 - b+树是如何减少io的相对于b树
+- 大表如何修改字段
+  - [refer](https://www.cnblogs.com/tujia/p/13164389.html)
+- MySQL联合索引原理
+  - [refer](https://blog.csdn.net/cherry93925/article/details/100719559?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&utm_relevant_index=8)

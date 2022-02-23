@@ -61,14 +61,6 @@
 
 
 
-- promethus和elk的区别
-   -- prometheus 擅长metrics监控，单条数据占用空间极小，并且有着云原生和诸多开源node-exporter支持，业务系统支持也较为容易
-   -- elk 记录详细日志，可以用来做详细的问题排查和日志分析等
-- 架构的知识
-    - 可扩展
-    - 可伸缩
-
-
 - 两个客户端A,B A读取数据，B修改还未提交，A再次读取，A两次读取的消息是一致的吗？
 - grpc 版本字段增加，服务端客户端如何升级？先后顺序是什么
     - 先升级服务端，后升级客户端
@@ -140,10 +132,19 @@
 - slice的扩容规则（sixin）
 
 ## GC
-- gc 原理？三色法？混合写屏障？
-- 垃圾回收怎么检测阻塞
-- golnag gc 三色标记,写屏障
-
+- 1. go gc 为何是非分代的？
+- 2. go gc 为何是非紧缩的?
+- 3. 并发三色标记扫描是什么？
+- 4. go 如何实现的 并发三色标记扫描？
+- 5. 强三色不变性和弱三色不变性的含义？
+- 6. gc是为何需要写屏障？
+- 7. 插入写屏障和删除写屏障的时机和区别？go中如何实现的？
+- 8. GC 的四个阶段？
+- 9. 为何需要辅助标记和辅助清扫？
+- 10. GC 4个阶段，STW发生在何时？
+- 11. 描述下 gc 调步算法的实现？
+- 12. 工作中gc debug的使用？
+- 13. gc 清扫阶段 对象回收 和 内存单元回收的联系和差异？
 ## 说出打印结果（探探）
 ```go
 type query func(string) string
@@ -413,4 +414,4 @@ fmt.Println(x,y,z,k,p)
     - [refer2](https://blog.csdn.net/u011957758/article/details/96633984?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164515668616781683951530%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164515668616781683951530&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-96633984.pc_search_result_positive&utm_term=golang+syncmap&spm=1018.2226.3001.4187)
 - Go 如何高效地拼接字符串 ?
 
-
+- [github他人收集](https://github.com/KeKe-Li/data-structures-questions/blob/master/src/chapter05/golang.01.md#Go%E4%B8%AD%E7%9A%84%E9%94%81%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0)

@@ -1,0 +1,3 @@
+- promethus和elk的区别
+  -- prometheus 擅长metrics监控，单条数据占用空间极小，并且有着云原生和诸多开源node-exporter支持，业务系统支持也较为容易
+  -- elk 记录详细日志，可以用来做详细的问题排查和日志分析等
