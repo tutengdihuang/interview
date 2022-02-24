@@ -16,4 +16,6 @@
   - 从而尽量减少消费者组成员之间的分区迁移。
   - 因此，通过 scaling out/down 操作触发的端到端重新平衡时间更短，这有利于重量级、有状态的消费者，比如 Kafka Streams 应用程序。
   - [refer]()
+- kafka面试题from微信公众号（三分钟秒懂大数据）
+  - [refer](https://mp.weixin.qq.com/s/O_1ztfA8CLcYXLdxTa7tgw)
 
