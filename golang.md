@@ -136,6 +136,7 @@
     - [refer](https://lingchao.xin/post/why-golang-garbage-collector-not-implement-generational-and-compact-gc.html)
 - 2. go gc 为何是非紧缩的?
     - [refer](https://lingchao.xin/post/why-golang-garbage-collector-not-implement-generational-and-compact-gc.html)
+    - [refer](https://www.jianshu.com/p/f1d62dcb0d76)
 - 3. 并发三色标记扫描是什么？
 - 4. go 如何实现的 并发三色标记扫描？
 - 5. 强三色不变性和弱三色不变性的含义？
