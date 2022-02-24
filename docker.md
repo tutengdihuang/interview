@@ -1,0 +1,19 @@
+- DOCKER 是什么？
+- 如何使用DOCKER 技术创建与环境无关的容器系统？
+- DOCKERFILE 配置文件中的COPY 和ADD 指令有什么不同
+- DOCKER 映像（IMAGE）是什么
+- DOCKER 容器（CONTAINER）是什么
+- DOCKER 中心（HUB）什么概念
+- 在任意给定时间点指出一个DOCKER 容器可能存在的运行阶段
+- 有什么方法确定一个DOCKER 容器运行状态
+- 在DOCKERFILE 配置文件中最常用的指令有哪些
+- 什么类型的应用（无状态性或有状态性）更适合DOCKER 容器技术
+- 解释基本DOCKER 应用流程
+- DOCKER IMAGE 和DOCKER LAYER (层) 有什么不同
+- 虚拟化技术是什么
+- 什么是孤儿卷及如何删除它
+- docker为什么是轻量级别的
+- docker run -v
+- docker rm
+- 虚拟机和普通容器的不同点？网络实现都有什么原理？
+- 

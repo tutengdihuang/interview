@@ -1,0 +1,20 @@
+- 如何设计一个长短链接服务器
+  - [reference](https://xie.infoq.cn/article/483fcfbe3f942cb1fa9d9ce20)
+  - [refer](https://mp.weixin.qq.com/s/dEeG-xZfKt4FUqaHmj7lWw)
+- 如何设计一个抢红包系统
+- 阿里云面试题，用CAS操作实现一个消息队列（golang）
+- 如何设计一个分布式锁
+  - 可扩展
+  - 可伸缩
+- 设计一个或者几个微服务，能够满足每天离线处理一亿条数，清洗入库，支持crash safe
+- 如何保证缓存和数据库的一致性
+  - https://mp.weixin.qq.com/s/4W7vmICGx6a_WX701zxgPQ
+- 给你一个服务，数据表怎么设计（发散性问题，可以随意回答）
+  - (考虑稳定，数据不丢失等问题)
+  - 优雅退出是正常情况下数据保存的能力，断电的话就靠各种log文件
+  - 多机房备份，然后别的系统处理，mq或者binlog落盘
+- 秒杀不用队列怎么做
+- 朋友圈，微博 发状态，怎么做
+- 订单表怎么设计
+  
+  
