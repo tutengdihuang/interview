@@ -91,5 +91,6 @@
 - 为啥RedisCluster设计成16384个槽
   - [refer](https://zhuanlan.zhihu.com/p/99037321)
 - 100w数据，redis怎么取出来合适
+- 网关集群发生脑列了你的hash环会受到什么影响，怎么解决（也许不是redis相关问题，redis也有脑裂的情况）
 
 

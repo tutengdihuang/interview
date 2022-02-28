@@ -52,8 +52,7 @@ return root
 }
 ```
 
-- hash一致性
-- https://mp.weixin.qq.com/s/dpwC4TAAO1CdlPWIC_KFUg
+  - https://mp.weixin.qq.com/s/dpwC4TAAO1CdlPWIC_KFUg
 - 算法题，最长连续子数组，输入[1,2,3,7,8,9,10]，返回4，最长连续的的是7,8,9,10
 - 算法题： 生成一个随机数组，然后写一个nlogn的排序算法，然后写个二分搜索验证你排序的结果
 - 两个gorouite 交替打印奇偶数
@@ -62,3 +61,6 @@ return root
 - 排序算法 快排的实现
 - 台阶背包问题
 - 黑眼睛和红眼睛https://www.zhihu.com/question/21262930
+## 分布式算法
+- gossip协议有什么优势
+- 一致性hash原理
