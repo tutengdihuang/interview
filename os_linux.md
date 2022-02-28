@@ -28,3 +28,4 @@
 - epoll 原理? select原理？ 什么水平触发 边缘触发？
 - linux中io_wait在哪里用过
 - tcp/ip协议中，第一次分手，server端回复fin ack后进入什么状态？对应在linux系统中的文件描述在哪里？
+- 简述一下线程切换的完整过程
