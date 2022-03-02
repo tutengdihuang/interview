@@ -440,3 +440,5 @@ range方案：不需要迁移数据，但有热点问题。
   - [refer](https://www.cnblogs.com/tujia/p/13164389.html)
 - MySQL联合索引原理
   - [refer](https://blog.csdn.net/cherry93925/article/details/100719559?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&utm_relevant_index=8)
+
+- 创建订单是一个数据库，创建库存是一个数据库，你怎么保证他们的数据一致性呢?其中一个消费失败 怎么处理呢?说一下
