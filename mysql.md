@@ -383,9 +383,7 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 
 - innodb是如何存储数据的
   - [refer](https://mp.weixin.qq.com/s/665zAn_PuTqAl_rJa_5Ilg)
-
-- mysql explain 各种字段的含义
-
+  
 - redolog 罗盘
   - https://blog.csdn.net/weixin_40471676/article/details/119732738
 

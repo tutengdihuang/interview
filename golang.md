@@ -283,12 +283,13 @@ func main() {
     - 当一个 Goroutine（协程）获得了 Mutex 后，其他 Goroutine（协程）就只能乖乖的等待，除非该 Goroutine 释放了该 Mutex。RWMutex 在读锁占用的情况下， 会阻止写，但不阻止读 RWMutex。 在写锁占用情况下，会阻止任何其他Goroutine（无论读和写）进来，整个锁相当于由该 Goroutine 独占
     同步锁的作用是保证资源在使用时的独有性，不会因为并发而导致数据错乱， 保证系统的稳定性。
    
-## channel  
+## channel 
 - channel阻塞和非阻塞内部实现
 - Channel 的 ring buffer 实现
     -channel 中使用了 ring buffer（环形缓冲区) 来缓存写入的数据。ring buffer 有很多好处，而且非常适合用来实现 FIFO 式的固定长度队列。在 channel 中，ring buffer 的实现如下：
 - Channel可以嵌套使用吗？即往channel里发送一个channel
     - 可以
+
 - 与其他语言相比，使用GO 有什么好处？
 - GO 支持什么形式的类型转换？将整数转换为浮点数
 - 什么是GOROUTINE？你如何停止它？
@@ -433,7 +434,7 @@ fmt.Println(x,y,z,k,p)
 - goroutine的亲缘性怎么体现出来
 
 - Golang中需要使用协程池吗？为什么？
-- Channel可以嵌套使用吗？即往channel里发送一个channel
+- goroutine为啥不设置id
 ## Test
 - go项目如何左覆盖率测试
     - go test ./... -v -gcflags=-l -p 1 -coverprofile=coverage.out
