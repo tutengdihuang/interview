@@ -4,7 +4,24 @@
 - 非nodeport和lb的svc怎么暴露给外部集群
 - k8s内部都有哪些证书，是一样的么
 - k8s master都有哪些组件，可以随意部署么
-- prometheus的内部组件和抓取机制，以及
+- prometheus的内部组件和抓取机制
 - 大规模优化思路k8s多region方案
 - iptables pod 流量的tables具体指什么
 - 一个pod创建流程，cni实现原理和某些特定场景优化，master组件功能和优化，网络问题排查，service account等使用，namespace和cgroup，证书相关
+- 怎么让K8S集群内资源使用量更平均
+- 如何修改scheduler的调度策略
+- Deployment和SatefulSet 的根本区别在哪里
+- POD创建过程中，controller和scheduler 各起到了什么作用，两者的联系是什么？
+- kube-proxy 在ISO 7层中的那一层 
+- StatefulSet 的滚动升级的过程是什么样的，现在我们希望只升级 StatefulSet 中的任意个节点进行测试, 可以怎么做?
+- Kubernetes 的所有资源约定了版本号, 为什么要这么做?
+- pod中penging状态，代表了什么？
+- 说下POD跨主机通信的过程。
+- APIserver 出现大量5XX，可能是出现了什么问题
+- K8S 集群节点出现NotReady 应该如何排查
+- 你做过哪些基于K8S云原生的业务改造
+- 节点如何优雅下线
+- 在节点上有200个工作中的容器的情况下，如何优雅下线
+- 多master如何保持一致性,有什么风险点吗?需要注意的地方?站在业务的角度分析
+- 大量POD的删除创建产生的资源使用，不需要关注吗？
+- 200个POD同时创建，会对集群，产生什么影响？
