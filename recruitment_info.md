@@ -1,2 +1,4 @@
 - 内推资源
     - https://github.com/ruanyf/weekly/issues/2234
+- https://github.com/ZvanYang/PHP-interview-myway
+- https://www.yuque.com/go-interview/set/daily-qa-202103
