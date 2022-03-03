@@ -52,17 +52,6 @@
 - redis里面有热点数据10w个。这时候一个程序员从数据库中捞了1000个新的数据返回，顶替了1000个热点数据（程序员用新的key塞入redis，导致redis中其他老的1000个key被删除）。用什么方式可以避免这样的情况发生？(字节面试题)
 	
 - redis 持久化有哪几种方式
-<<<<<<< HEAD:interview_redis.md
-  - [参考答案](https://cloud.tencent.com/developer/article/1442600)
-- redis 集群有哪几种
-<<<<<<< HEAD
-  - [参考答案](https://juejin.cn/post/6844904178154897415)
-=======
-- redis怎么做高可用，机制
-- kafka的分区，备份等名词的概念，主分区和备份分区怎么保证消息一致，怎么保证消息不丢？
->>>>>>> 5586e8c681861b3cd69eec9174ddf56e14517c0a
-	   
-=======
 - redis 集群有哪几种，redis集群怎么实现高可用
 - redis怎么做高可用，机制
 - 怎么保证redis和mysql的数据一致性
@@ -103,5 +92,3 @@
   - [refer](https://zhuanlan.zhihu.com/p/99037321)
 - 100w数据，redis怎么取出来合适
 
-
->>>>>>> a641ae7b01faa44df5aeeaaa535751f026436cbf:redis.md
