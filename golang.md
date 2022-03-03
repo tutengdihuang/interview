@@ -24,15 +24,6 @@
 
     - 内存消耗更少，大约一个groutine的大小为3kb
 
-- goroutine是什么，怎么执行
-    - goroutine是比线程还轻量的执行单位，是用户层面的
-    - 一个gourontine大约3kb左右
-    - 上下文切换成本小
-    - goroutine GMP模型，M：N模型
-    - 如果可以聊聊goroutine的生老病死
-- goroutine切换的原理
-    - 网络io阻塞主动切换，cpu占用时间过长信号切换，锁，channel
-- GO的GPM模型?P和M的数量怎么决定？如果在K8S容器部署，P和M又会有什么不同？
 
 - 什么是死锁？go什么情况会死锁？怎么避免死锁问题？
 - go sync包有哪些方法以及具体作用
@@ -125,8 +116,7 @@
         - 在变量前面加上版本号，每次变量更新的时候变量的版本号都+1，即A->B->A就变成了1A->2B->3A
 - mutex的原理
     - [refer](https://www.processon.com/view/link/6078e4416376891132d67bcf)
-- GMP模型？全局队列没有g了，怎么办
-    - 去其他p的g队列偷取
+
 - 说说常用的设计模式
 
 - slice的扩容规则（sixin）
@@ -148,6 +138,9 @@
 - 11. 描述下 gc 调步算法的实现？
 - 12. 工作中gc debug的使用？
 - 13. gc 清扫阶段 对象回收 和 内存单元回收的联系和差异？
+- 14. 三色法为什么需要灰色
+    - [refer](https://stackoverflow.com/questions/9285741/why-white-gray-black-in-gc#:~:text=2%20Answers&text=Gray%20means%20%22live%20but%20not,do%20a%20bit%20of%20marking.\)
+
 ## 说出打印结果（探探）
 ```go
 type query func(string) string
@@ -289,9 +282,14 @@ func main() {
 - 8、Go 当中同步锁有什么特点？作用是什么
     - 当一个 Goroutine（协程）获得了 Mutex 后，其他 Goroutine（协程）就只能乖乖的等待，除非该 Goroutine 释放了该 Mutex。RWMutex 在读锁占用的情况下， 会阻止写，但不阻止读 RWMutex。 在写锁占用情况下，会阻止任何其他Goroutine（无论读和写）进来，整个锁相当于由该 Goroutine 独占
     同步锁的作用是保证资源在使用时的独有性，不会因为并发而导致数据错乱， 保证系统的稳定性。
-    
-- 29、Channel 的 ring buffer 实现
+   
+## channel 
+- channel阻塞和非阻塞内部实现
+- Channel 的 ring buffer 实现
     -channel 中使用了 ring buffer（环形缓冲区) 来缓存写入的数据。ring buffer 有很多好处，而且非常适合用来实现 FIFO 式的固定长度队列。在 channel 中，ring buffer 的实现如下：
+- Channel可以嵌套使用吗？即往channel里发送一个channel
+    - 可以
+
 - 与其他语言相比，使用GO 有什么好处？
 - GO 支持什么形式的类型转换？将整数转换为浮点数
 - 什么是GOROUTINE？你如何停止它？
@@ -418,3 +416,32 @@ fmt.Println(x,y,z,k,p)
 - Go 如何高效地拼接字符串 ?
 
 - [github他人收集](https://github.com/KeKe-Li/data-structures-questions/blob/master/src/chapter05/golang.01.md#Go%E4%B8%AD%E7%9A%84%E9%94%81%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0)
+- 怎么设计一个无锁的pool
+## GMP
+- GMP什么时候回创建新的M，创建有数量限制吗
+- 阻塞GM绑定之后就回去寻找新的M吗
+- goroutine是什么，怎么执行
+    - goroutine是比线程还轻量的执行单位，是用户层面的
+    - 一个gourontine大约3kb左右
+    - 上下文切换成本小
+    - goroutine GMP模型，M：N模型
+    - 如果可以聊聊goroutine的生老病死
+- goroutine切换的原理
+    - 网络io阻塞主动切换，cpu占用时间过长信号切换，锁，channel
+- GO的GPM模型?P和M的数量怎么决定？如果在K8S容器部署，P和M又会有什么不同？
+- GMP模型？全局队列没有g了，怎么办
+    - 去其他p的g队列偷取
+- goroutine的亲缘性怎么体现出来
+
+- Golang中需要使用协程池吗？为什么？
+- goroutine为啥不设置id
+## Test
+- go项目如何左覆盖率测试
+    - go test ./... -v -gcflags=-l -p 1 -coverprofile=coverage.out
+
+## runtime
+- runtime.GOMAXPROCS(0)表示什么？为什么要这么用？
+
+## interface
+- interface内部实现原理
+- reflect的用途

@@ -28,7 +28,7 @@
 - 3、自适应哈希索引(ahi)
 
 - 4、预读(read ahead)
-
+- [refer](https://blog.csdn.net/weixin_45320660/article/details/115326483?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164576404416781683952707%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164576404416781683952707&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_click~default-1-115326483.pc_search_result_positive&utm_term=InnoDB%E5%BC%95%E6%93%8E%E7%9A%844%E5%A4%A7%E7%89%B9%E6%80%A7&spm=1018.2226.3001.4187)
 ## 数据库相关
 - 事物的隔离级别
     - 读未提交
@@ -77,12 +77,12 @@
 
 
 ## 百万级别或以上的数据如何删除
-    - 先删除索引
-    - 删除无用的数据
-    - 删除完成后重新创建索引
+- 先删除索引
+- 删除无用的数据
+- 删除完成后重新创建索引
 
 ## 什么是最左前缀原则？什么是最左匹配原则
-    - mysql 会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如 a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d 是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d 的顺序可以任意调整
+- mysql 会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如 a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d 是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d 的顺序可以任意调整
 
 ## 什么是聚簇索引？何时使用聚簇索引与非聚簇索引
     - 聚簇索引：将数据存储与索引放到了一块，找到索引也就找到了数据
@@ -130,7 +130,8 @@ mysql8.0 change buffer ： [源码说明](https://dev.mysql.com/doc/refman/8.0/e
 
 change buffer 和 二级索引、唯一索引有什么关系呢？
 	刚才上面提到了，change buffer本质还是为了提高性能的，基本都是涉及到了二级索引页的变更。那如果涉及到唯一索引呢？
-	对于唯一索引来说，所有的更新操作都要先判断这个操作是否违反唯一性约束！因此，这必须要将数据页读入内存才能判断。如果都已经读入到内存了，那直接更新内存会更快，就没必要使用 change buffer 了【没想到吧>._.<】。，唯一索引的更新就不能使用 change buffer，实际上也只有普通索引可以使用。
+	对于唯一索引来说，所有的更新操作都要先判断这个操作是否违反唯一性约束！因此，这必须要将数据页读入内存才能判断。如果都已经读入到内存了，那直接更新内存会更快，就没必要使用 change buffer 了【没想到吧>._.<】。，唯一索引的更新就不能使用 change buffer，
+    实际上也只有普通索引可以使用。
 
 
 ~~~
@@ -382,9 +383,7 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 
 - innodb是如何存储数据的
   - [refer](https://mp.weixin.qq.com/s/665zAn_PuTqAl_rJa_5Ilg)
-
-- mysql explain 各种字段的含义
-
+  
 - redolog 罗盘
   - https://blog.csdn.net/weixin_40471676/article/details/119732738
 
@@ -441,3 +440,5 @@ range方案：不需要迁移数据，但有热点问题。
   - [refer](https://www.cnblogs.com/tujia/p/13164389.html)
 - MySQL联合索引原理
   - [refer](https://blog.csdn.net/cherry93925/article/details/100719559?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&utm_relevant_index=8)
+
+- 创建订单是一个数据库，创建库存是一个数据库，你怎么保证他们的数据一致性呢?其中一个消费失败 怎么处理呢?说一下
