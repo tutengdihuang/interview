@@ -435,6 +435,7 @@ fmt.Println(x,y,z,k,p)
 
 - Golang中需要使用协程池吗？为什么？
 - goroutine为啥不设置id
+- 线程模型有哪些？为什么 Go Scheduler 需要实现 M:N 的方案？Go Scheduler 由哪些元素构成呢？
 ## Test
 - go项目如何左覆盖率测试
     - go test ./... -v -gcflags=-l -p 1 -coverprofile=coverage.out
