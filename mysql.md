@@ -405,7 +405,8 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
   - 当联合索引的列都出现在查询条件中时，查询条件的顺序不影响
 
 - 如何优化mysql, mysql慢查询如何优化，有哪些手段，
-  - [refer](https://blog.csdn.net/weixin_38805083/article/details/123061693)
+  - [如何定位慢查询](https://blog.csdn.net/qq_27276045/article/details/110020421)
+  - [refer优化](https://blog.csdn.net/weixin_38805083/article/details/123061693)
 
 - mysql事物回滚过程说一下，越详细越好
 ```shell
