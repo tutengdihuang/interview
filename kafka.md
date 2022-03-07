@@ -22,3 +22,4 @@
 
 - kafka 系列问题
   - [refer](https://mp.weixin.qq.com/s/8OAQzZ5jZYV2Fvtg0pfZoQ)
+- kafka和rabbitMQ有什么本质的区别
