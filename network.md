@@ -212,3 +212,5 @@
 - 内存同步中间件过程中宕机，怎么办？
 - tcp timewait发生在哪里
 - JWT有什么缺点?
+- tcp链接
+    - [refer](https://mp.weixin.qq.com/s/X6c_H5_4OInR8nFQVn7IMA)

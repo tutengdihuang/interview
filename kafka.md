@@ -19,3 +19,7 @@
 - kafka面试题from微信公众号（三分钟秒懂大数据）
   - [refer](https://mp.weixin.qq.com/s/O_1ztfA8CLcYXLdxTa7tgw)
 - 同一个kafka消费者组的多个consumer对offset提交，小的偏移消费失败，大的偏移消费成功了，如何进行提交偏移
+
+- kafka 系列问题
+  - [refer](https://mp.weixin.qq.com/s/8OAQzZ5jZYV2Fvtg0pfZoQ)
+- kafka和rabbitMQ有什么本质的区别

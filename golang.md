@@ -445,3 +445,5 @@ fmt.Println(x,y,z,k,p)
 ## interface
 - interface内部实现原理
 - reflect的用途
+- 指针实现接口和结构体实现接口有什么区别？
+    - [refer](https://mp.weixin.qq.com/s/g-D_eVh-8JaIoRne09bJ3Q)
