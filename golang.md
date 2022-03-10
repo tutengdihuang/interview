@@ -139,7 +139,7 @@
 - 12. 工作中gc debug的使用？
 - 13. gc 清扫阶段 对象回收 和 内存单元回收的联系和差异？
 - 14. 三色法为什么需要灰色
-    - [refer](https://stackoverflow.com/questions/9285741/why-white-gray-black-in-gc#:~:text=2%20Answers&text=Gray%20means%20%22live%20but%20not,do%20a%20bit%20of%20marking.\)
+    - [refer](https://stackoverflow.com/questions/9285741/why-white-gray-black-in-gc#:~:text=2%20Answers&text=Gray%20means%20%22live%20but%20not,do%20a%20bit%20of%20marking.)
 
 ## 说出打印结果（探探）
 ```go
