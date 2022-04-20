@@ -1,9 +1,8 @@
 
 ## 1
-- 《Go 1.18 源码剖析》1. 初始化：https://www.yuque.com/docs/share/0f4adfee-e9f6-4306-bc15-1653e0bb1d06?# 《1.1 引导》；https://www.yuque.com/docs/share/58fbf5d6-3932-4e73-a1f6-849566fbd45e?# 《1.2 初始化》。
+- 《Go 1.18 源码剖析》1. 初始化：https://www.yuque.com/docs/share/0f4adfee-e9f6-4306-bc15-1653e0bb1d06?#
+- 《1.1 引导》；https://www.yuque.com/docs/share/58fbf5d6-3932-4e73-a1f6-849566fbd45e?# 《1.2 初始化》
 - 《Go 1.18 源码剖析》内存分配器：https://www.yuque.com/docs/share/77c62e26-05fa-4f4d-8fdd-cc110d641987?#
-- 《2.1 定义》；https://www.yuque.com/docs/share/696ae233-0a3d-4ad0-83e4-921d4be1a9ce?# 《2.2.1 地址空间》
-
 
 ## 2《Go 1.18 源码剖析》内存分配器：
 
