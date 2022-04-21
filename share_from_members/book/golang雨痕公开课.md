@@ -35,6 +35,7 @@
 
 
 ## 3《Go 1.18 源码剖析》垃圾回收器
+- GC
     - https://www.yuque.com/docs/share/9fcad442-fa5f-4d22-b00e-51bba3b10268?# 《3.1 概述》
     - https://www.yuque.com/docs/share/a8fb7bd1-753e-4393-ad99-33c4378a1731?# 《3.2 初始化》
     - https://www.yuque.com/docs/share/d1d6e7b2-3c8a-4481-b7ce-294843e2de24?# 《3.3 启动》
@@ -96,11 +97,13 @@
     - https://www.yuque.com/docs/share/5a0631a2-2126-4b65-9a8d-918203733d4f?# 《4.7.5 定时器》
 
 ## 5 Go 1.18 源码剖析》并发通道
+- concurrency
     - https://www.yuque.com/docs/share/e6621239-7e91-4286-9abc-322af0a26924?# 《5.1 创建》
     - https://www.yuque.com/docs/share/a8c76f5f-2784-4491-9a72-441b34a5d471?# 《5.2 收发》
     - https://www.yuque.com/docs/share/5ef74d3e-52a3-449d-a583-c766d2a5ac65?# 《5.3 选择》
 
-## 6
+## 6 defer panic conventions
+- 关键字
     - https://www.yuque.com/docs/share/44dfe7ad-c745-4a46-a663-23d07c38ddc7?# 《6.1 defer》；
     - https://www.yuque.com/docs/share/31d8a036-8e12-4631-bed4-387299f35377?# 《6.2 panic》；
     - https://www.yuque.com/docs/share/d3ec4cbe-038c-47d1-b8a1-39aa5ad69643?# 《8.1 call conventions》
@@ -114,7 +117,7 @@
     - https://www.yuque.com/docs/share/702cd675-98bf-4591-b775-f01a935bbe90?# 《7.3 执行》
 
 ## 8其他
-
+- others
     - https://www.yuque.com/docs/share/d3ec4cbe-038c-47d1-b8a1-39aa5ad69643?# 《8.1 调用约定》
     - https://www.yuque.com/docs/share/e125a9cc-88c4-41b4-997d-5f9a60f7cc2e?# 《8.2 接口》
     - https://www.yuque.com/docs/share/384a56d5-eab9-4856-84cc-d02d61f39ef7?# 《8.3 切片》
