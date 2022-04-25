@@ -96,7 +96,7 @@
     - https://www.yuque.com/docs/share/2d07b8a9-02be-4e1e-a29c-c276f245a097?# 《4.7.4 网络轮询》
     - https://www.yuque.com/docs/share/5a0631a2-2126-4b65-9a8d-918203733d4f?# 《4.7.5 定时器》
 
-## 5 Go 1.18 源码剖析》并发通道
+## 5 《Go 1.18 源码剖析》并发通道
 - concurrency
     - https://www.yuque.com/docs/share/e6621239-7e91-4286-9abc-322af0a26924?# 《5.1 创建》
     - https://www.yuque.com/docs/share/a8c76f5f-2784-4491-9a72-441b34a5d471?# 《5.2 收发》
