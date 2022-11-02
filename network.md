@@ -214,3 +214,5 @@
 - JWT有什么缺点?
 - tcp链接
     - [refer](https://mp.weixin.qq.com/s/X6c_H5_4OInR8nFQVn7IMA)
+
+### http 报文头格式有哪些 请求-响应
