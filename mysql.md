@@ -35,10 +35,9 @@
     - 读提交 解决脏读
     - 可重复读 解决不可重复读
     - 串行化    幻读
-- 如何解决不可重复读？
+- 如何解决不可重复读？mysql MVCC底层原理
     - [查看mvcc的原理](https://www.processon.com/view/link/620b01c807912979960d3ac1)
     - [查看mvcc的原理](https://www.processon.com/view/link/620b01d46376897c8c712c57)
-- mysql MVCC底层原理
 
 - 数据库什么情况下走索引，什么情况下不走索引
     - mysql认为全局遍历比走索引快的时候就会放弃索引，
@@ -51,13 +50,9 @@
     - 第二类丢失更新(覆盖丢失/两次更新问题，Second lost update)
         - A事务覆盖B事务已经提交的数据，造成B事务所做操作丢失
 
-
-## 创建索引时需要注意什么
-- 非空字段：应该指定列为 NOT NULL，除非你想存储 NULL
+## 创建索引的规则
 - 取值离散大的字段
 - 索引字段越小越好
-
-## 创建索引的规则
 - 主键外键必须有索引
 - 数据量超过300的表应该有索引
 - 经常与其他表进行连接的表，在连接字段上应该建立索引；
@@ -83,6 +78,24 @@
 
 ## 什么是最左前缀原则？什么是最左匹配原则
 - mysql 会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如 a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d 是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d 的顺序可以任意调整
+    ```
+    表 table (a , b ,c, d )
+    索引 index01 (a,b,c)
+
+    如果 select a,b,c from table where a=1 and b=1 and c=1;
+    那么索引 a b c 都会用到，且不用回表，会最快返回；
+
+    如果 select a,b,c from table where a=1 and  c=1;
+    那么索引只会用到 a 过滤,但仍然不用回表，较快返回；
+
+    如果 select a,b,c from table where a=1 and b>1 and b<1 and c=1;
+    那么索引只会用到 a , b  ，但是仍然不用回表，较快返回；
+
+    如果 select a,b,c ,d from table where  b=1 and c=1;
+    那么索引会无法使用  ，返回时间长；
+    ```
+- MySQL联合索引原理
+    - [refer](https://blog.csdn.net/cherry93925/article/details/100719559?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&utm_relevant_index=8)
 
 ## 什么是聚簇索引？何时使用聚簇索引与非聚簇索引
     - 聚簇索引：将数据存储与索引放到了一块，找到索引也就找到了数据
@@ -171,12 +184,13 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 ## 为什么b+树减少了io
 - 见上一题
 ## 什么是索引？什么是回表？
+- https://baijiahao.baidu.com/s?id=1669796110955401759&wfr=spider&for=pc
 ## MySQL的ACID怎么实现？
 ## 有哪些隔离级别？实现原理？
 ## 脏读、幻读概念？怎么解决幻读的问题？间隙锁是什么？可重复读怎么实现？
 - 脏读：事务A向表中插入了一条数据，此时事务A还没有提交，此时查询语句能把这条数据查询出来，这种现现象称为脏读；脏读比较好理解
 - 不可重复读：一个事务A第一次读取的结果之后，  另外一个事务B更新了A事务读取的数据，A事务在第二次读取的结果和第一次读取的结果不一样这种现象称为不可重复读
-- 幻读：事务A更新表里面的所有数据，这时事务B向表中插入了一条数据，这时事务A第一次的查询结果和第二次的查询结果不一致，这种现象我称为幻读
+- 幻读：事务A更新表里面的所有数据，这时事务B向表中插入了一条数据，这 时事务A第一次的查询结果和第二次的查询结果不一致，这种现象我称为幻读
 - 间隙锁：当我们用范围条件而不是相等条件检索数据，并请求共享或排他锁时，InnoDB会给符合条件的已有数据记录的索引项加锁；对于键值在条件范围内但不存在的记录，叫做“间隙(GAP)”，InnoDB也会对这个“间隙”加锁，这种锁机制就是所谓的间隙锁(NEXT-KEY)锁
   - 键值在条件范围内但不存在的记录，叫做“间隙(GAP)”，InnoDB也会对这个“间隙”加锁
 - 间隙锁的作用：1.防止幻读, 2.防止数据误删/改
@@ -226,6 +240,7 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
     - 如果查询条件用了索引/主键，那么select ..... for update就会进行行锁。
     - 如果是普通字段(没有索引/主键)，那么select ..... for update就会进行锁表。
   - 乐观锁和悲观锁数据库层面如何实现？
+    - [refer](https://blog.csdn.net/just_learing/article/details/124898579?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522166779193316782417037044%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=166779193316782417037044&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-3-124898579-null-null.142^v63^control,201^v3^control_1,213^v1^control&utm_term=%E4%B9%90%E8%A7%82%E9%94%81%E5%92%8C%E6%82%B2%E8%A7%82%E9%94%81%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B1%82%E9%9D%A2%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0&spm=1018.2226.3001.4187)
   - 缓存数据和数据库数据如何实现一致性？
 
 - 使用索引查询一定能提高查询的性能吗？为什么
@@ -384,7 +399,7 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 - innodb是如何存储数据的
   - [refer](https://mp.weixin.qq.com/s/665zAn_PuTqAl_rJa_5Ilg)
   
-- redolog 罗盘
+- redolog 落盘
   - https://blog.csdn.net/weixin_40471676/article/details/119732738
 
 - mysql主备如何保证数据同步 
@@ -401,8 +416,6 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 
 
 - clickhouse的分布式是怎么工作的
-- where a and b and c , abc 谁先执行
-  - 当联合索引的列都出现在查询条件中时，查询条件的顺序不影响
 
 - 如何优化mysql, mysql慢查询如何优化，有哪些手段，
   - [如何定位慢查询](https://blog.csdn.net/qq_27276045/article/details/110020421)
@@ -439,11 +452,9 @@ range方案：不需要迁移数据，但有热点问题。
 - b+树是如何减少io的相对于b树
 - 大表如何修改字段
   - [refer](https://www.cnblogs.com/tujia/p/13164389.html)
-- MySQL联合索引原理
-  - [refer](https://blog.csdn.net/cherry93925/article/details/100719559?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&utm_relevant_index=8)
 
 - 创建订单是一个数据库，创建库存是一个数据库，你怎么保证他们的数据一致性呢?其中一个消费失败 怎么处理呢?说一下
 - 页分裂伪代码，b+树的倒数底层层可以页分裂么
   - [InnoDB中的页合并与分裂](https://zhuanlan.zhihu.com/p/98818611)
 
-- regolog和binlog 怎么保证一致性的
+- redolog和binlog 怎么保证一致性的
