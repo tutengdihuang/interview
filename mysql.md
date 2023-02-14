@@ -2,6 +2,16 @@
 - InnoDB支持事务，MyISAM不支持
 - InnoDB支持外键，而MyISAM不支持
 - InnoDB索引是聚簇索引，MyISAM索引是非聚簇索引。
+  - 聚簇索引：数据和索引在一起，找到了索引就找到了数据
+    - 聚簇索引默认是主键，如果表中没有定义主键，InnoDB 会选择一个唯一的非空索引代替，InnoDB 会隐式定义一个主键来作为聚簇索引
+      - 如果没有非空主键，innodb隐士定义
+    - 如果你已经设置了主键为聚簇索引，必须先删除主键，然后添加我们想要的聚簇索引，最后恢复设置主键即可
+    - InnoDB 只聚集在同一个页面中的记录。包含相邻键值的页面可能相距甚远
+    - 一般要根据这个表最常用的SQL查询方式来进行选择，某个字段作为聚簇索引，或组合聚簇索引
+    - 最终目的就是在相同结果集情况下，尽可能减少逻辑IO
+  - 非聚簇索引：将数据存储于索引分开结构，索引结构的叶子节点指向了数据的对应行，myisam通过key_buffer把索引先缓存到内存中，
+    - 当需要访问数据时（通过索引访问数据），在内存中直接搜索索引，然后通过索引找到磁盘相应数据，这也就是为什么索引不在key buffer命中时，速度慢的原因
+  - [参考文档](https://cloud.tencent.com/developer/article/1541265)
 - InnoDB不保存表的具体行数，执行select count(*) from table时需要全表扫描。而MyISAM用一个变量保存了整个表的行数，执行上述语句时只需要读出该变量即可，速度很快（注意不能加有任何WHERE条件）
 - Innodb不支持全文索引，而MyISAM支持全文索引，在涉及全文索引领域的查询效率上MyISAM速度更快高
 - MyISAM表格可以被压缩后进行查询操作
@@ -242,6 +252,7 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
   - 乐观锁和悲观锁数据库层面如何实现？
     - [refer](https://blog.csdn.net/just_learing/article/details/124898579?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522166779193316782417037044%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=166779193316782417037044&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-3-124898579-null-null.142^v63^control,201^v3^control_1,213^v1^control&utm_term=%E4%B9%90%E8%A7%82%E9%94%81%E5%92%8C%E6%82%B2%E8%A7%82%E9%94%81%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B1%82%E9%9D%A2%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0&spm=1018.2226.3001.4187)
   - 缓存数据和数据库数据如何实现一致性？
+
 
 - 使用索引查询一定能提高查询的性能吗？为什么
   - 不一定
