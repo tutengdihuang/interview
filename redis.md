@@ -3,7 +3,9 @@
 ## redis的nvm
 
 ## Redis在项目中的使用场景
+- https://blog.csdn.net/agonie201218/article/details/123640871
 ## redis常用的数据结构
+- string, hash , set zset, list
 ## redis的zset实现
 ## Redis缓存淘汰策略
 - [reference](https://www.processon.com/view/link/620b45476376897c8c7239d0)
