@@ -103,3 +103,5 @@
         - 多线程或者多端同时并发处理，可以通过锁的方式来规避
         - [refer](https://www.yisu.com/zixun/117203.html)
 
+#
+- Redis 如何实现的分布式锁？ setnx 、 redisson ，为什么要用 redisson ? watchdog "如果让你基于 setnx 实现一个 watchdog 怎么做？怎么做 watch 呢？~

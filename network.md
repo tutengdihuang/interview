@@ -219,3 +219,7 @@
 
 ### 如何查看tcp ip 协议的缓冲区
 - https://blog.csdn.net/weixin_31881743/article/details/116706900?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522166781052816782395333341%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=166781052816782395333341&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-3-116706900-null-null.142^v63^control,201^v3^control_1,213^v1^control&utm_term=TCP%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%8F%91%E9%80%81%E7%BC%93%E5%86%B2%E5%8C%BA%E5%92%8C%E6%8E%A5%E6%94%B6%E7%BC%93%E5%86%B2%E5%8C%BA%20linux&spm=1018.2226.3001.4187
+
+#
+- 层负载均衡是什么？传输层，除了4层负载均衡？7层
+- 
