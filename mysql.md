@@ -543,7 +543,6 @@ mysqldump -u username -p database_name > backup.sql
 - mysql 事务原子性怎么实现的
 - 分库分表策略
 - 分表键和查询条件不一致咋整
-  - [refer](https://www.processon.com/view/link/620af9b50e3e7429dd02be21)
 - 缓存和数据库的一致性怎么保证,当不一致的时候如何解决
   - [refer](https://www.processon.com/view/link/620af9b50e3e7429dd02be21)
 
