@@ -448,3 +448,11 @@ fmt.Println(x,y,z,k,p)
 - reflect的用途
 - 指针实现接口和结构体实现接口有什么区别？
     - [refer](https://mp.weixin.qq.com/s/g-D_eVh-8JaIoRne09bJ3Q)
+
+#
+- 当G发送阻塞时,G和M和P是如何变化的
+#
+- 什么是自旋,M为什么要自旋
+#
+- map使用时有什么要注意的
+# 

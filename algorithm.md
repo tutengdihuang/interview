@@ -70,6 +70,13 @@ return root
 - gossip协议有什么优势
 - 一致性hash原理
 
+# 
+- 什么是hash
+#
+- hash冲突?怎么解决
+#
+- golang的map,是怎么解决hash冲突的?
+#
 
 
 

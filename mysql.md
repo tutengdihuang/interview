@@ -608,3 +608,17 @@ range方案：不需要迁移数据，但有热点问题。
   - [InnoDB中的页合并与分裂](https://zhuanlan.zhihu.com/p/98818611)
 
 - redolog和binlog 怎么保证一致性的
+
+
+#
+- mysql服务崩溃后,redoLog恢复后,数据会写到对应的文件上吗?
+#
+- 数据写入redoLog的过程？ 在xx过程后,会写到redoLog文件中
+
+#
+- 缓存和mysql的数据不一致问题,怎么解决
+
+#
+- 数据更新时并发问题怎么解决,怎么解决
+
+# 
