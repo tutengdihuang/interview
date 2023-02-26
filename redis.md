@@ -1,7 +1,7 @@
 ## redis zset 实现原理
     - 压缩链表，跳表
 ## redis的nvm
-
+- https://www.processon.com/view/link/61e5084a7d9c0806a8ab9829
 ## Redis在项目中的使用场景
 - https://blog.csdn.net/agonie201218/article/details/123640871
 ## redis常用的数据结构
@@ -104,4 +104,8 @@
         - [refer](https://www.yisu.com/zixun/117203.html)
 
 #
-- Redis 如何实现的分布式锁？ setnx 、 redisson ，为什么要用 redisson ? watchdog "如果让你基于 setnx 实现一个 watchdog 怎么做？怎么做 watch 呢？~
+- Redis 如何实现的分布式锁？ setnx 、 redisson ，为什么要用 redisson ? watchdog "如果让你基于 setnx 实现一个 watchdog 怎么做？怎么做 watch 呢？
+
+#
+- 怎么样基于redis存储文件的
+- redis的RDB瘦身你是怎么做的，key是不过期吗？

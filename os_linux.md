@@ -34,3 +34,19 @@
 - 说说cache 流程，cache snoop 协议
 - 你还用到了阿里云对象存储存储图片文件?那没有有用到它的其他一些功能?它是怎么收费的?图片加
   速用过吗?
+#
+- tcpdump
+    - [refer](https://blog.csdn.net/qq_51574197/article/details/116171604?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522167740263216782428647734%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=167740263216782428647734&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-116171604-null-null.142^v73^control,201^v4^add_ask,239^v2^insert_chatgpt&utm_term=tcpdump&spm=1018.2226.3001.4187)
+#
+- netstat
+    - [refer](https://blog.csdn.net/qq_42014600/article/details/90372315?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522167738459316800182794622%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=167738459316800182794622&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-90372315-null-null.142^v73^control,201^v4^add_ask,239^v2^insert_chatgpt&utm_term=netstat&spm=1018.2226.3001.4187)
+#
+- 如何查看进程的状态查看进程的网络状态
+  - [refer](https://www.meijindong.com/posts/2679121756.html)
+```bash
+   ps -l   列出与本次登录有关的进程信息；
+   ps -aux   查询内存中进程信息；
+   ps -aux | grep ***   查询***进程的详细信息；
+   top   查看内存中进程的动态信息；
+   kill -9 pid   杀死进程。
+```
