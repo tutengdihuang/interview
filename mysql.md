@@ -507,7 +507,7 @@ mysqldump -u username -p database_name > backup.sql
 
 - mysql update 语句执行流程
   - [refer](https://processon.com/mindmap/60f6547e079129546fe40268)
-  - redo undo,binlog  介绍下,
+  - redo undo,binlog  介绍下,    
     - redo log
       - 将哪个数据页哪里发生了修改写入到redo log当中,而不需要将修改过的整个数据页刷到磁盘当中去
       - 写redo log同样也是一次磁盘的写操作,凭什么说它的性能就更高一点呢

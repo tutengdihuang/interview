@@ -16,4 +16,5 @@
 - docker run -v
 - docker rm
 - 虚拟机和普通容器的不同点？网络实现都有什么原理？
-- 
+- docker中copy add的区别
+- docker中entrypoint和cmd的区别
