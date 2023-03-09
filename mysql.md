@@ -504,7 +504,7 @@ mysqldump -u username -p database_name > backup.sql
     - <img src="https://user-images.githubusercontent.com/31843331/152718010-7916171b-432c-4a42-96c7-d25324c4b76f.png" width = "300" height = "300" alt="图片名称" />
   - [reference](https://developer.aliyun.com/article/782236)
 
-
+#
 - mysql update 语句执行流程
   - [refer](https://processon.com/mindmap/60f6547e079129546fe40268)
   - redo undo,binlog  介绍下,    
@@ -515,6 +515,8 @@ mysqldump -u username -p database_name > backup.sql
         - 对于binlog来说一个修改操作可能会同时修改多个数据页,这些数据页又不是连续的,此时就意味着随机写磁盘
         - 写redo log和刷数据页,写redo log是磁盘的顺序写,小数据量,而刷数据页到磁盘可能就意味着随机写,而且还是 大数据量的,两者一比较,写redo log的性能可能比刷数据页的性能高100倍
         - 所以redo log 既能保证数据不丢失，也能保证了性能
+        - redo log是循环写的，空间固定会用完；
+        - binlog是可以追加写入的。“追加写”是指binlog文件写到一定大小后会切换到下一个，并不会覆盖以前的日志
     - binlog
       - Mysql binlog是二进制日志文件，用于记录mysql的数据更新或者潜在更新
       - Row level
@@ -535,7 +537,9 @@ mysqldump -u username -p database_name > backup.sql
 
       Relay Log文件的命名规则通常是"relay-bin.NNNNNN"，其中"NNNNNN"表示一个递增的数字，用于标识不同的Relay Log文件。
       在MySQL复制过程中，Relay Log文件可能会不断增长，因此需要定期清理和删除旧的Relay Log文件，以释放磁盘空间
+    - 执行流程 两阶段提交（https://blog.csdn.net/qq_33591903/article/details/122030252）
       ```
+#      
 - mysql 半同步介绍下
   - 主库只需要等待至少一个从节点，收到并且flush binlog到relay log文件即可，
   - 主库不需要等待所有从库给主库反馈，这里只是一个收到的反馈，而并不是从库已经完成并提交的反馈，
@@ -587,6 +591,7 @@ update undo log
   - limit
   - 分表
   - 读写分离
+  - 如果是web页面展示，可以用前1000条为真，并保证性能。
 - 分表通过哪些指标分表？
 ```shell
 1、hash取模
@@ -622,3 +627,9 @@ range方案：不需要迁移数据，但有热点问题。
 - 数据更新时并发问题怎么解决,怎么解决
 
 # 
+- select count(*) from stu offset 10 limit 10, 如果表中有一百条数据，能查出多少条数据。
+```mysql
+这个查询语句无法按预期工作，因为"count(*)"函数返回表中的总行数，将"offset"和"limit"应用于"count"函数是没有意义的。
+```
+
+# 如何让> <走索引
