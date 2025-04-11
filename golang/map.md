@@ -559,4 +559,113 @@ if ok {
 | API      | 简单直观                | 方法调用                 |
 | 类型安全 | 是（编译时）            | 否（使用interface{}）    |
 | 适用场景 | 单线程、需要类型安全    | 并发读写、读多写少场景   |
+```
+
+## map的底层原理
+
+### 扩容机制
+
+Go map有两种扩容机制：增量扩容（Growing）和等量扩容（SameSizing）。
+
+#### 1. 增量扩容
+触发条件：负载因子超过阈值（6.5）
+```go
+loadFactor := count / (2^B)  // count是键值对数量
+if loadFactor > 6.5 {
+    // 触发增量扩容
+}
+```
+
+扩容过程：
+1. 空间分配：
+   - 新的B值 = 旧的B值 + 1
+   - bucket数量翻倍
+   - 重新分配键值对
+
+2. 数据迁移规则：
+   - 每个旧bucket的数据会分裂到两个新bucket
+   - 使用key的hash值第B位决定分配位置
+
+#### 2. 等量扩容
+触发条件：overflow buckets过多
+```go
+if B < 15 {
+    if overflowBuckets > 2^B {
+        // 触发等量扩容
+    }
+} else {
+    if overflowBuckets > 2^15 {
+        // 触发等量扩容
+    }
+}
+```
+
+扩容过程：
+1. 不增加bucket数量
+2. 重新排列已有数据
+3. 减少overflow bucket的使用
+
+### 渐进式迁移
+
+1. 迁移机制：
+```go
+// 每次访问map时执行
+evacuate(oldbucket) {
+    // 最多迁移2个bucket
+    for i := 0; i < 2; i++ {
+        migrateOldBucket(oldbucket + i)
+    }
+}
+```
+
+2. 访问规则：
+```go
+// 读取操作
+if h.oldbuckets != nil {
+    // 可能需要先检查旧bucket
+    if !evacuated(bucket) {
+        // 从旧bucket读取
+    }
+}
+// 从新bucket读取
+
+// 写入操作
+if needsEvacuation() {
+    evacuate(bucket)
+}
+// 写入新bucket
+```
+
+### 性能优化建议
+
+1. 预防扩容：
+```go
+// 提前预估容量
+m := make(map[string]int, expectedSize)
+
+// 避免频繁增删
+// 不好的做法
+for i := 0; i < n; i++ {
+    m[key] = value  // 可能触发多次扩容
+}
+
+// 好的做法
+m := make(map[string]int, n)
+for i := 0; i < n; i++ {
+    m[key] = value
+}
+```
+
+2. 性能影响：
+   - 扩容期间读操作可能需要检查两个bucket
+   - 写操作可能触发迁移
+   - 渐进式迁移避免了明显的性能抖动
+
+3. 内存影响：
+   - 增量扩容期间内存使用翻倍
+   - 等量扩容基本不增加内存使用
+
+这种双重扩容机制配合渐进式迁移的设计，保证了Go map在各种场景下都能保持良好的性能和内存使用效率。增量扩容解决容量问题，等量扩容优化空间利用，渐进式迁移确保了操作的平滑性。
 ``` 
+
+## map的底层原理
