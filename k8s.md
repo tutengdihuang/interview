@@ -592,4 +592,18 @@ kubectl rollout status statefulset/mysql-statefulset
 ```
 4. 检查 MySQL 服务是否正常运行，数据是否一致。
 
-通过以上步骤和考虑因素，可以在 k8s 中安全、稳定地进行滚动升级。 
+通过以上步骤和考虑因素，可以在 k8s 中安全、稳定地进行滚动升级。
+
+
+user  userid
+
+
+产品id 产品名称 价格
+
+订单  userid  time  productid  quant
+
+
+要求计算出上个月每一天的销售额
+
+
+select p.price*o.quant, date  from p  joinon p.id=o.PID group by 
