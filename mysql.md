@@ -285,7 +285,70 @@ MySQL InnoDB Cluster：MySQL InnoDB Cluster是一个集成了MySQL Group Replica
 - select a.* from tb a where val in (select top 2 val from tb where name=a.name order by val desc) order by a.name,a.val
 ## group和having的区别 
 - [refer](https://blog.csdn.net/u012106306/article/details/115009698?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164430198116780357225944%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164430198116780357225944&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-115009698.pc_search_insert_ulrmf&utm_term=group%E5%92%8Chaving%E7%9A%84%E5%8C%BA%E5%88%AB&spm=1018.2226.3001.4187)
+#### GROUP BY 与 HAVING 的区别
 
+#### 基本定义
+
+**GROUP BY** 是分组子句，将结果集按指定列的值合并成若干组，通常配合聚合函数（`COUNT`、`SUM`、`AVG` 等）使用。
+
+**HAVING** 是分组后的过滤子句，对 `GROUP BY` 产生的每一个分组进行条件筛选，保留满足条件的分组。
+
+---
+
+#### 核心区别
+
+| | WHERE | GROUP BY | HAVING |
+|---|---|---|---|
+| 作用对象 | 原始行 | 分组依据 | 分组结果 |
+| 执行时机 | 分组**之前** | 过滤后分组 | 分组**之后** |
+| 能否用聚合函数 | ❌ 不能 | — | ✅ 可以 |
+
+---
+
+#### 执行顺序
+
+```
+FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY
+```
+
+> `WHERE` 先过滤原始数据，再交给 `GROUP BY` 分组，`HAVING` 最后对分组结果再筛选。
+
+---
+
+#### 示例对比
+
+**场景：统计每个部门的员工数，只保留人数超过5人的部门**
+
+```sql
+-- ❌ 错误写法：WHERE 不能用聚合函数
+SELECT dept_id, COUNT(*) AS cnt
+FROM employees
+WHERE COUNT(*) > 5       -- 报错！此时还没分组，聚合函数无意义
+GROUP BY dept_id;
+
+-- ✅ 正确写法：用 HAVING 过滤分组结果
+SELECT dept_id, COUNT(*) AS cnt
+FROM employees
+GROUP BY dept_id
+HAVING COUNT(*) > 5;
+```
+
+**场景：WHERE 和 HAVING 配合使用**
+
+```sql
+-- 先用 WHERE 排除离职员工，再分组，再过滤人数
+SELECT dept_id, COUNT(*) AS cnt
+FROM employees
+WHERE status = 'active'       -- ① 先过滤原始行
+GROUP BY dept_id              -- ② 再分组
+HAVING COUNT(*) > 5;          -- ③ 最后过滤分组
+```
+
+---
+
+#### 记忆口诀
+
+> **WHERE 过滤行，HAVING 过滤组；聚合函数只能交给 HAVING 来管。**
 #
 ## live环境千万条数据如何迁移
 ```mysql
@@ -337,6 +400,173 @@ mysqldump -u username -p database_name > backup.sql
     - alter table practice.Student wait 100 add column Sheight int(4) not null default 0 comment "身高"
   - 第二种方案
     - http://blog.sina.com.cn/s/blog_4cb992270101ke0z.html
+#### Live 环境表结构修改
+
+---
+
+#### 一、核心原则
+
+> **Live 环境改表的最大风险：锁表 → 阻塞业务请求 → 服务不可用**
+
+MySQL DDL 操作默认会加 **MDL 元数据锁（Metadata Lock）**，大表执行 `ALTER TABLE` 期间，所有读写请求全部阻塞排队。
+
+---
+
+#### 二、不同操作的风险等级
+
+| 操作 | 风险 | 说明 |
+|------|------|------|
+| 加索引 | 🔴 高 | 大表重建，锁时间长 |
+| 加列（末尾） | 🟡 中 | MySQL 8.0+ 支持 Instant，旧版本重建表 |
+| 修改列类型 | 🔴 高 | 全表重建，必须用工具 |
+| 删除列 | 🔴 高 | 全表重建 |
+| 修改列名 | 🔴 高 | 全表重建 |
+| 加默认值 | 🟢 低 | 仅改元数据，瞬间完成 |
+| 删除索引 | 🟢 低 | 仅改元数据 |
+| 改列长度（varchar增大）| 🟢 低 | 部分场景仅改元数据 |
+
+---
+
+#### 三、推荐工具：pt-online-schema-change & gh-ost
+
+##### 1. pt-osc（Percona Toolkit）
+
+**原理：**
+```
+① 创建影子表 _new（新结构）
+② 在原表加触发器，同步增删改到影子表
+③ 批量将原表数据 COPY 到影子表
+④ 原子性 RENAME 交换两张表
+⑤ 删除旧表和触发器
+```
+
+```bash
+pt-online-schema-change \
+  --host=127.0.0.1 \
+  --user=root \
+  --password=xxx \
+  --alter "ADD COLUMN remark VARCHAR(255) DEFAULT NULL" \
+  D=mydb,t=orders \
+  --execute
+```
+
+**关键参数：**
+```bash
+--chunk-size=1000          # 每批 COPY 行数（按业务负载调整）
+--max-load=Threads_running=50   # 超过阈值自动暂停
+--critical-load=Threads_running=100  # 超过直接退出
+--no-drop-old-table        # 保留旧表，自己手动确认删除
+--dry-run                  # 预演，不真实执行
+```
+
+**限制：**
+- 原表必须有主键或唯一索引
+- 触发器期间有小量额外写入开销
+
+---
+
+##### 2. gh-ost（GitHub 出品）⭐ 更推荐
+
+**原理：** 不用触发器，直接解析 **binlog** 实时同步变更，对原表侵入更小。
+
+```bash
+gh-ost \
+  --host=127.0.0.1 \
+  --user=root \
+  --password=xxx \
+  --database=mydb \
+  --table=orders \
+  --alter="ADD COLUMN remark VARCHAR(255) DEFAULT NULL" \
+  --allow-on-master \
+  --execute
+```
+
+**关键参数：**
+```bash
+--chunk-size=1000           # 每批复制行数
+--max-load=Threads_running=30   # 自动限速
+--throttle-control-replicas     # 根据从库延迟限速
+--postpone-cut-over-flag-file=/tmp/gh-ost.postpone  # 手动控制最终切换时机
+--panic-flag-file=/tmp/gh-ost.panic    # 写入该文件立即中止
+```
+
+**优势对比 pt-osc：**
+
+| | pt-osc | gh-ost |
+|---|---|---|
+| 同步方式 | 触发器 | binlog 解析 |
+| 原表写入影响 | 有（触发器开销）| 极小 |
+| 可暂停/恢复 | ❌ | ✅ |
+| 手动控制切换 | ❌ | ✅ |
+| 需要从库 | 否 | 推荐有从库 |
+
+---
+
+#### 四、MySQL 8.0 Instant DDL
+
+部分操作直接支持 **ALGORITHM=INSTANT**，毫秒级完成，无需借助工具：
+
+```sql
+-- 末尾加列（8.0.29+ 支持任意位置）
+ALTER TABLE orders
+  ADD COLUMN remark VARCHAR(255) DEFAULT NULL,
+  ALGORITHM=INSTANT;
+
+-- 修改列默认值
+ALTER TABLE orders
+  ALTER COLUMN status SET DEFAULT 0,
+  ALGORITHM=INSTANT;
+
+-- 如果不支持 INSTANT，立即报错，不会降级为锁表操作
+```
+
+---
+
+#### 五、操作 SOP（标准流程）
+
+```
+1. 评估表大小
+   SELECT table_rows, data_length/1024/1024 AS size_mb
+   FROM information_schema.TABLES
+   WHERE table_name = 'orders';
+
+2. 低峰期执行（凌晨 2~4 点）
+
+3. 先在从库验证一遍
+
+4. 执行前监控好以下指标：
+   - Threads_running（活跃线程数）
+   - 主从复制延迟
+   - 慢查询数量
+
+5. 使用 gh-ost / pt-osc 执行，保留 --no-drop-old-table
+
+6. 观察 15~30 分钟，确认无异常后删除旧表
+
+7. 回滚预案：
+   - gh-ost 写入 panic-flag 文件立即中止
+   - 旧表仍在 → RENAME 回来即可
+```
+
+---
+
+#### 六、PostgreSQL Live 改表
+
+PostgreSQL 对部分 DDL 更友好，但 `ACCESS EXCLUSIVE LOCK` 同样危险：
+
+```sql
+-- ✅ 加列有默认值（PG 11+ 瞬间完成，不重写表）
+ALTER TABLE orders ADD COLUMN remark TEXT DEFAULT '';
+
+-- ✅ 并发建索引，不锁写操作
+CREATE INDEX CONCURRENTLY idx_orders_user_id ON orders(user_id);
+
+-- ⚠️ 设置超时保护，避免长时间等锁
+SET lock_timeout = '3s';    -- 超3秒获取不到锁直接失败
+SET statement_timeout = '0'; -- DDL 本身不限制执行时长
+```
+
+> **总结：** Live 改表 = **gh-ost/pt-osc + 低峰期 + 监控 + 回滚预案**，绝不裸跑 `ALTER TABLE`。
 ## live环境批量数据修改
 ## live环境mysql主从同步 数据流失怎么办
 ```mysql
@@ -361,41 +591,353 @@ mysqldump -u username -p database_name > backup.sql
     - 当进行范围查找时，存在回旋查找的问题
     - 排序的时候，需要进行一次中序遍历（order by）
 ## 2022-01-19收录
-- 你碰到过的数据库优化最难的问题，及如何解决
-- mysql 索引覆盖，回表 （滴滴）
+### 你碰到过的数据库优化最难的问题，及如何解决
+#### 碰到过的数据库优化最难的问题及解决过程
+
+---
+
+#### 问题一：千万级订单表分页查询，越翻越慢
+
+##### 背景
+
+订单列表页支持按时间倒序翻页，前几页响应正常，翻到第 500 页之后接口直接超时。
+
+##### 根因分析
+
+```sql
+-- 原始写法
+SELECT * FROM orders ORDER BY created_at DESC LIMIT 500000, 20;
+```
+
+`LIMIT 500000, 20` 的本质是：**扫描并丢弃前 50 万行，再返回 20 行**，即使有索引也逃不掉这个代价：
+
+```
+第    1 页：LIMIT 0,      20  → 扫描 20 行
+第    2 页：LIMIT 20,     20  → 扫描 40 行
+第  100 页：LIMIT 1980,   20  → 扫描 2000 行
+第 5000 页：LIMIT 100000, 20  → 扫描 100020 行  ← 超时
+```
+
+##### 解决过程
+
+###### 方案一：主键游标分页（最优解）
+
+不用 OFFSET 跳过数据，改为记录**上一页最后一条 id**，下次从这个位置继续往后取：
+
+```sql
+-- 第1页（无游标，正常查）
+SELECT id, user_id, amount, status, created_at
+FROM orders
+ORDER BY id DESC
+LIMIT 20;
+-- 返回：id = 100, 99, 98 ... 81，最后一条 id = 81
+
+-- 第2页：从 id=81 之前继续取（书签式翻页）
+SELECT id, user_id, amount, status, created_at
+FROM orders
+WHERE id < 81          -- 游标：上一页最后一条的 id
+ORDER BY id DESC
+LIMIT 20;
+-- 返回：id = 80, 79, 78 ... 61，最后一条 id = 61
+
+-- 第3页：从 id=61 之前继续
+SELECT id, user_id, amount, status, created_at
+FROM orders
+WHERE id < 61
+ORDER BY id DESC
+LIMIT 20;
+```
+
+**直观理解：**
+
+```
+id：100, 99, 98 ... 81 | 80, 79, 78 ... 61 | 60, 59 ...
+     ←────第1页──────→    ←────第2页──────→
+                        ↑
+                   WHERE id < 81
+                   书签，从这里继续
+```
+
+**为什么主键游标不会回表：**
+
+```
+InnoDB 聚簇索引结构：
+  叶子节点 = 主键id + 完整行数据
+
+WHERE id < 81 → 直接走聚簇索引 → 叶子节点已含全部字段 → 无需回表 ✅
+
+对比普通索引（如 created_at）：
+  辅助索引叶子节点 = created_at + id（只有主键）
+  → 还需拿 id 回聚簇索引再查一次完整行  ← 回表 ❌
+```
+
+**翻页性能对比：**
+
+| | OFFSET 分页 | 主键游标分页 |
+|---|---|---|
+| 第 1 页 | 扫描 20 行 | 扫描 20 行 |
+| 第 100 页 | 扫描 2000 行 | 扫描 20 行 |
+| 第 5000 页 | 扫描 10 万行 | 扫描 20 行 |
+| 耗时趋势 | 越翻越慢 📈 | 始终恒定 ✅ |
+
+**效果：** 从超时 → 稳定 8ms，无论翻到第几页耗时一致。
+
+**代价：** 不支持跳页，产品侧改为"加载更多"交互模式。
+
+---
+
+###### 方案二：延迟关联（需要支持跳页时）
+
+```sql
+-- ❌ 原始：直接 OFFSET，回表 50 万次
+SELECT * FROM orders ORDER BY id DESC LIMIT 500000, 20;
+
+-- ✅ 延迟关联：子查询只扫覆盖索引，找到目标 id 后只回表 20 次
+SELECT o.*
+FROM orders o
+JOIN (
+    SELECT id FROM orders
+    ORDER BY id DESC
+    LIMIT 500000, 20    -- 覆盖索引，不回表
+) tmp ON o.id = tmp.id;
+```
+
+---
+
+###### 方案三：有筛选条件时配合联合索引
+
+```sql
+-- 查某个用户的订单，按 id 倒序翻页
+CREATE INDEX idx_user_id ON orders(user_id, id DESC);
+
+SELECT id, amount, status, created_at
+FROM orders
+WHERE user_id = 123 AND id < 8888888
+ORDER BY id DESC
+LIMIT 20;
+-- 命中联合索引，精准定位，只扫 20 行 ✅
+```
+
+---
+
+###### 接口设计示例
+
+```
+请求：GET /orders?size=20&last_id=81
+
+后端 SQL：
+  WHERE id < 81（last_id 为空时不加，表示第一页）
+  ORDER BY id DESC LIMIT 20
+
+响应：
+  { "data": [...], "next_cursor": 61, "has_more": true }
+```
+
+---
+
+###### 三种方案对比
+
+| 方案 | 支持跳页 | 性能 | 改造成本 |
+|------|---------|------|---------|
+| 主键游标分页 | ❌ | 🟢 最优，始终 O(1) | 中（前端记录游标） |
+| 延迟关联 | ✅ | 🟡 较好，深分页仍有代价 | 低（只改 SQL） |
+| Elasticsearch | ✅ | 🟢 最优 | 高 |
+
+---
+
+#### 问题二：读写分离后，数据不一致导致 Bug
+
+##### 背景
+
+引入主从读写分离后，用户下单后立刻跳转订单详情页，概率性出现"订单不存在"。
+
+##### 根因分析
+
+```
+用户下单 → 写主库 → 立刻读从库
+                         ↑
+              主从复制有 50~200ms 延迟
+              从库还没同步到这条数据 → 查不到 → "订单不存在"
+```
+
+##### 解决过程
+
+```
+① 强一致读：写操作完成后的下一次读，强制走主库
+  → ORM 层标记：刚写过的请求，本次会话内读主库
+
+② 半同步复制：开启 semi-sync，至少 1 个从库确认收到 binlog
+  才返回写成功，从根本上将延迟从 200ms 压到 20ms 以内
+```
+
+最终方案：**① + ② 结合**，核心写操作后强制读主库 + 半同步复制兜底。
+
+---
+
+#### 问题三：EXPLAIN 全是索引，但查询还是慢
+
+##### 背景
+
+一条 SQL 的 EXPLAIN 显示走了索引，rows 也不大，但线上 P99 延迟高达 3 秒。
+
+##### 根因分析
+
+```sql
+-- EXPLAIN 看起来正常
+EXPLAIN SELECT ...
+-- type=ref, key=idx_user_id, rows=200  ← 一切正常？
+
+-- 用 EXPLAIN ANALYZE 看实际耗时
+EXPLAIN ANALYZE SELECT ...
+-- actual time=2800ms  ← 和预估完全不符！
+
+-- 查看锁状态
+SHOW ENGINE INNODB STATUS\G
+-- 发现大量 lock wait，有事务持锁未释放
+
+-- 找到罪魁祸首
+SELECT * FROM information_schema.innodb_trx\G
+-- 有一个事务开启了 40 分钟，持有大量行锁！
+```
+
+发现代码里：**事务内部做了外部 HTTP 调用**，HTTP 超时导致事务迟迟不提交，行锁一直持有。
+
+##### 解决过程
+
+```
+① 立即 kill 掉超长事务（应急）
+
+② 修改代码：
+   事务内只做纯数据库操作
+   HTTP 调用移到事务提交之后执行
+
+③ 加监控告警：
+   事务执行超过 5s 自动告警
+   SET innodb_lock_wait_timeout = 10;  -- 等锁超过10s直接报错
+```
+
+---
+
+#### 问题四：加了索引反而更慢
+
+##### 背景
+
+给 `status` 字段加了索引，EXPLAIN 显示命中，但整体查询反而比全表扫描慢。
+
+##### 根因分析
+
+```
+status 字段只有 4 个值，数据分布极度不均：
+  paid       → 占 85% 的数据
+  pending    → 占 10%
+  cancelled  → 占  4%
+  refunded   → 占  1%
+```
+
+查 `status = 'paid'` 时命中 85% 的行，MySQL 优化器判断：**回表代价 > 全表扫描**，但有时仍强行走索引，反而更慢。
+
+##### 解决过程
+
+```sql
+-- 方案一：低基数字段改为联合索引，加上时间范围缩小扫描
+CREATE INDEX idx_status_created ON orders(status, created_at DESC);
+
+SELECT * FROM orders
+WHERE status = 'paid' AND created_at > '2024-01-01'
+ORDER BY created_at DESC LIMIT 20;
+
+-- 方案二：应急强制忽略该索引
+SELECT * FROM orders IGNORE INDEX(idx_status) WHERE status = 'paid';
+
+-- 方案三：归档历史数据，主表只保留近3个月数据，总量大幅下降
+```
+
+---
+
+#### 四个问题的共同规律
+
+```
+问题一（深分页）   → 索引设计不适配业务访问模式
+问题二（主从延迟） → 架构引入了一致性窗口，业务代码没有感知
+问题三（锁等待）   → 慢不等于 SQL 本身慢，要看等待链路全貌
+问题四（索引失效） → 数据分布决定索引价值，不是加了索引就一定快
+```
+
+> **核心经验：数据库优化最难的地方不是技术，是"表象和根因之间的距离"——EXPLAIN 正常、索引命中，不代表查询就快，要深入到锁、事务、数据分布、架构链路去找真正的瓶颈。**
+
+### mysql 索引覆盖，回表 （滴滴）
   - SQL只需要通过索引就可以返回查询所需要的数据，而不必通过二级索引查到主键之后再去查询数据
-- 忘了加唯一索引有啥补救措施吗
+### 忘了加唯一索引有啥补救措施吗
   - 只是参考答案：新增别出现相同数据就好
   - 添加唯一索引，检查重复数据，重新倒入数据，做好数据备份
-- 在唯一索引的约束下，如何优雅地软删除
-- 需求: 一张表中有个字段appid，同一个appid只允许存在一行正常记录，但是可以存在多条软删除记录
+### 在唯一索引的约束下，如何优雅地软删除
+### 需求: 一张表中有个字段appid，同一个appid只允许存在一行正常记录，但是可以存在多条软删除记录
   - 答案：额外加一个status字段，0为正常，非零为已删除。和appid作为复合唯一索引，软删除的时候将status改为当前时间戳
-- mysql索引的类型，各自的特点，还有索引失效的情况
-- 腾讯外包公司题：
-  - mysql唯一索引是否可以为null？为什么？、
-    - 允许存在的多个NULL值数据
-  - select for update是表锁还是行锁？（仔细查找答案，有坑）
+### mysql索引的类型，各自的特点，还有索引失效的情况
+### 腾讯外包公司题：
+
+###  mysql唯一索引是否可以为null？为什么？、
+#### MySQL唯一索引是否可以为NULL
+**可以，且允许存在多个 NULL 值。**
+
+##### 核心原因
+1. **唯一索引约束的是“非NULL值”唯一**
+   - 唯一索引只限制**非NULL字段值不能重复**
+   - 对 NULL 值不做唯一性校验
+2. **NULL 在数据库中代表“未知值”**
+   - SQL 标准规定：**NULL 不等于任何值，也不等于自身**
+   - 多个 NULL 之间不判定为重复，因此可以共存
+3. **业务与底层实现**
+   - 唯一索引允许字段为 NULL，且能插入多条 NULL 记录
+   - 主键索引**不允许 NULL**，且只能有一条记录
+
+##### 一句话背诵版（面试直接说）
+**MySQL 唯一索引允许为 NULL，且可以存在多个 NULL。因为 NULL 代表未知值，不参与唯一性判断，唯一约束只限制非 NULL 值不能重复。**
+
+### select for update是表锁还是行锁？（仔细查找答案，有坑）
     - 如果查询条件用了索引/主键，那么select ..... for update就会进行行锁。
     - 如果是普通字段(没有索引/主键)，那么select ..... for update就会进行锁表。
-  - 乐观锁和悲观锁数据库层面如何实现？
+### 乐观锁和悲观锁数据库层面如何实现？
     - [refer](https://blog.csdn.net/just_learing/article/details/124898579?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522166779193316782417037044%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=166779193316782417037044&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-3-124898579-null-null.142^v63^control,201^v3^control_1,213^v1^control&utm_term=%E4%B9%90%E8%A7%82%E9%94%81%E5%92%8C%E6%82%B2%E8%A7%82%E9%94%81%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B1%82%E9%9D%A2%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0&spm=1018.2226.3001.4187)
   - 缓存数据和数据库数据如何实现一致性？
 
 
-- 使用索引查询一定能提高查询的性能吗？为什么
+### 使用索引查询一定能提高查询的性能吗？为什么
   - 不一定
   - 索引需要额外的存储空间和处理,那些不必要的索引反而会使查询反应时间变慢.使用索引查询不一定能提高查询性能
-- 事务还没提交的时候，redolog 能不能被持久化到磁盘呢(字节一面)
+### 事务还没提交的时候，redolog 能不能被持久化到磁盘呢(字节一面)
   - [解释参考](https://mp.weixin.qq.com/s/kdPb4v5nOu0LMCj8s1ETNg)
+#### 事务未提交时，redo log 能否持久化到磁盘
+**可以，而且一定会发生。**
+这是 MySQL 最经典的面试题之一，答案非常明确：
 
-- mysql 联合查询用法
+##### 核心结论
+**事务未提交时，redo log 完全可以、并且经常会被持久化（刷盘）到磁盘。**
+
+##### 详细原理（面试标准答案）
+1. **redo log 的刷盘时机，不依赖事务是否提交**
+   - InnoDB 有一个**后台线程**，每隔 **1秒** 就会把 redo log buffer 里的日志**强制刷到磁盘**。
+   - 哪怕事务还在执行、还没执行 `commit`，只要时间到了，就会刷盘。
+
+2. **刷盘的触发条件**
+   - 每隔 1 秒，后台线程自动刷盘
+   - redo log buffer 占用达到 **50%**，自动刷盘
+   - 事务执行 `commit` 时，**强制刷盘**（保证持久性）
+
+3. **为什么未提交也要刷盘？**
+   - 防止数据库崩溃时，**已经执行但未提交的操作也能恢复**
+   - 崩溃恢复时，未提交的事务会通过 undo log 回滚，已提交的通过 redo log 重做
+
+##### 一句话背诵版（字节面试直接说）
+**事务没提交，redo log 也能持久化到磁盘。因为 InnoDB 有后台线程每隔1秒、或日志缓冲区满了就会刷盘，不依赖 commit。**
+### mysql 联合查询用法
   - INNER JOIN(等值连接) 只返回两个表中联结字段相等的行
   - LEFT JOIN(左联接) 返回包括左表中的所有记录和右表中联结字段相等的记录
   - RIGHT JOIN(右联接) 返回包括右表中的所有记录和左表中联结字段相等的记录
   - SELECT * FROM 表1 INNER JOIN 表2 ON 表1.字段号=表2.字段号
   - SELECT * FROM (表1 INNER JOIN 表2 ON 表1.字段号=表2.字段号) INNER JOIN 表3 ON 表1.字段号=表3.字段号
   - SELECT * FROM ((表1 INNER JOIN 表2 ON 表1.字段号=表2.字段号) INNER JOIN 表3 ON 表1.字段号=表3.字段号) INNER JOIN 表4 ON Member.字段号=表4.字段号
-- mysql group用法
+### mysql group用法
   - group by语法可以根据给定数据列的每个成员对查询结果进行分组统计，最终得到一个分组汇总表
     - 查询每个部门的总的薪水数
     - SELECT DEPT, MAX(SALARY) AS MAXIMUM
@@ -415,81 +957,144 @@ mysqldump -u username -p database_name > backup.sql
       GROUP BY DEPT
       HAVING COUNT( * ) >2
       ORDER BY DEPT
-- mysql group by  having 和 where 执行顺序
-- mysql 索引有哪些
+### mysql group by  having 和 where 执行顺序
+### mysql 索引有哪些
   - 1.普通索引
   - 2.唯一索引
   - 3.主键索引
   - 4.组合索引
   - 5.全文索引
     - fulltext索引
-- mysql 主键索引和二级索引有什么区别
+### mysql 主键索引和二级索引有什么区别
   - mysql中每个表都有一个聚簇索引（clustered index ），除此之外的表上的每个非聚簇索引都是二级索引，又叫辅助索引（secondary indexes）
   - 
-- mysql 做过哪些优化
-  - SQL语句的优化
-    - 尽量避免使用子查询
-    - 避免函数索引
-    - 用IN来替换OR
-    - LIKE前缀%号、双百分号、_下划线查询非索引列或*无法使用到索引，如果查询的是索引列则可以
-    - 读取适当的记录LIMIT M,N，而不要读多余的记录
-    - 避免数据类型不一致
-    - 分组统计可以禁止排序sort，总和查询可以禁止排重用union all
-      - union和union all的差异主要是前者需要将结果集合并后再进行唯一性过滤操作，这就会涉及到排序，增加大量的CPU运算，加大资源消耗及延迟
-      - union all的前提条件是两个结果集没有重复数据
-      - 一般是我们明确知道不会出现重复数据的时候才建议使用 union all 提高速度
-      - 如果排序字段没有用到索引，就尽量少排序
-    - 避免随机取记录
-    - 禁止不必要的ORDER BY排序
-    - 批量INSERT插入
-    - 不要使用NOT等负向查询条件
-    - 尽量不用select *
-      - SELECT *增加很多不必要的消耗（cpu、io、内存、网络带宽）
-    - 区分in和exists
-      - 区分in和exists主要是造成了驱动顺序的改变
-      - 如果是exists，那么以外层表为驱动表，先被访问
-      - 如果是IN，那么先执行子查询
-      - IN适合于外表大而内表小的情况；EXISTS适合于外表小而内表大的情况
-  - 索引的优化
-    - Join语句的优化
-      - 尽可能减少Join语句中的NestedLoop的循环次数：“永远用小结果集驱动大的结果集
-      - 优先优化Nested Loop的内层循环（也就是最外层的Join连接），因为内层循环是循环中执行次数最多的，每次循环提升很小的性能都能在整个循环中提升很大的性能
-      - 对被驱动表的join字段上建立索引
-      - 当被驱动表的join字段上无法建立索引的时候，设置足够的Join Buffer Size
-      - 尽量用inner join(因为其会自动选择小表去驱动大表).避免 LEFT JOIN (一般我们使用Left Join的场景是大表驱动小表)和NULL，那么如何优化Left Join呢
-        - 条件中尽量能够过滤一些行将驱动表变得小一点，用小表去驱动大表
-        - 右表的条件列一定要加上索引（主键、唯一索引、前缀索引等），最好能够使type达到range及以上
-      - 适当地在表里面添加冗余信息来减少join的次数
-      - 使用更快的固态硬盘
-    - 避免索引失效（mysql什么情况下索引会失效）
-      - 最佳左前缀法则
-      - 不在索引列上做任何操作
-        - (计算、函数、(自动or手动)类型转换)，会导致索引失效而转向全表扫描
-      - 存储引擎不能使用索引中范围条件右边的列
-      - 尽量使用覆盖索引(只访问索引的查询(索引列和查询列一致))
-      - mysql在使用不等于(!= 或者 <>)的时候无法使用索引会导致全表扫描。
-      - is null, is not null 也无法使用索引，在实际中尽量不要使用null
-      - like 以通配符开头(‘%abc..’)mysql索引失效会变成全表扫描的操作
-      - 字符串不加单引号索引失效
-      - 少用or，用它来连接时会索引失效
-      - 尽量避免子查询，而用join
-      - 在组合索引中，将有区分度的索引放在前面
-      - 避免在 where 子句中对字段进行 null 值判断
-      - [失效场景](https://mp.weixin.qq.com/s/nnwXug8EaLiIl4UIAElvMQ)
-- 相对B树，B+树做索引的优势
+### mysql 做过哪些优化
+ #### 1. SQL 语句优化
+##### 1.1 查询语句优化
+###### 1.1.1 禁止使用 SELECT *
+增加 CPU、IO、内存、网络带宽消耗，无法使用覆盖索引，必须回表查询。
+###### 1.1.2 使用 LIMIT 控制返回条数
+读取适当记录，避免查询多余数据，减少网络传输和内存占用。
+###### 1.1.3 避免数据类型不一致
+字符串不加引号、数字与字符串比较，会导致索引失效、全表扫描。
+###### 1.1.4 避免负向查询条件
+NOT、!=、<>、IS NULL、IS NOT NULL 无法使用索引。
+###### 1.1.5 避免随机取记录
+ORDER BY RAND() 性能极差，禁止使用。
+###### 1.1.6 禁止不必要的 ORDER BY 排序
+排序字段无索引且数据量大时，消耗大量 CPU 和 IO。
+
+##### 1.2 子查询与连接优化
+###### 1.2.1 尽量避免子查询，改用 JOIN
+子查询会产生临时表，效率远低于 JOIN。
+###### 1.2.2 用 IN 替换 OR
+OR 连接多条件容易导致索引失效，IN 列表值不宜过多。
+###### 1.2.3 合理使用 IN 和 EXISTS
+- IN：先执行子查询，再匹配外表，适用于外表大、内表小。
+- EXISTS：先遍历外表，再子查询校验，适用于外表小，内表大。
+
+##### 1.3 聚合与合并结果优化
+###### 1.3.1 分组统计禁止额外排序
+GROUP BY 默认排序，可加 ORDER BY NULL 禁止排序。
+###### 1.3.2 优先使用 UNION ALL
+- UNION：合并、去重、排序，资源消耗高。
+- UNION ALL：直接合并，无去重无排序，效率更高。
+- 使用前提：明确结果集无重复数据。
+
+##### 1.4 插入与写入优化
+###### 1.4.1 批量 INSERT 插入
+多行合并插入，减少事务和连接开销。
+
+#### 2. 索引优化
+##### 2.1 索引设计原则
+###### 2.1.1 遵循最佳左前缀法则
+组合索引必须满足最左前缀才能命中。
+###### 2.1.2 高区分度字段放前面
+提升索引筛选效率。
+###### 2.1.3 使用覆盖索引
+查询列与索引列一致，避免回表。
+###### 2.1.4 不在索引列上做操作
+计算、函数、类型转换会导致索引失效。
+
+##### 2.2 JOIN 语句优化
+###### 2.2.1 小结果集驱动大结果集
+减少 NestedLoop 循环次数。
+###### 2.2.2 被驱动表关联字段建索引
+###### 2.2.3 无法建索引时调大 join_buffer_size
+###### 2.2.4 优先使用 INNER JOIN
+优化器自动选择小表驱动大表。
+###### 2.2.5 LEFT JOIN 优化
+驱动表提前过滤变小，右表关联字段建索引。
+###### 2.2.6 适当冗余字段
+减少 JOIN 次数。
+
+#### 3. 索引失效场景
+##### 3.1 查询条件导致失效
+###### 3.1.1 LIKE 以通配符开头
+%abc、_abc 索引失效，abc% 有效。
+###### 3.1.2 OR 连接且有字段无索引
+整体索引失效。
+###### 3.1.3 使用负向条件
+!=、<>、IS NULL、IS NOT NULL、NOT IN。
+###### 3.1.4 WHERE 判断字段 NULL
+无法使用索引。
+
+##### 3.2 索引列操作导致失效
+###### 3.2.1 索引列使用函数
+###### 3.2.2 索引列进行计算
+###### 3.2.3 索引列发生类型转换
+字符串不加单引号等。
+
+##### 3.3 组合索引使用不当
+###### 3.3.1 违反最佳左前缀法则
+###### 3.3.2 范围条件右边列失效
+范围条件后索引列无法命中。
+
+##### 3.4 优化器选择导致失效
+优化器判断全表扫描更快，或数据区分度极低、分布不均。
+
+#### 4. 补充优化点
+##### 4.1 避免函数索引
+非必要不建立。
+##### 4.2 控制 JOIN 表数量
+##### 4.3 无索引尽量不排序
+##### 4.4 使用 SSD 提升 IO 性能
+
+---
+
+#### 最终精简版（面试背诵）
+##### 一、SQL 优化
+不用 SELECT *，用 LIMIT，少排序；
+避免子查询，改用 JOIN；
+优先 UNION ALL；
+批量 INSERT，避免负向查询。
+
+##### 二、索引优化
+遵循左前缀，高区分度在前；
+使用覆盖索引，禁止索引列运算；
+JOIN 小表驱动大表，被驱动表建索引。
+
+##### 三、索引失效场景
+左模糊 %abc；
+OR 无索引、类型不一致、函数运算；
+负向查询、判断 NULL；
+组合索引跨列使用。
+
+
+### 相对B树，B+树做索引的优势
   - B+树的磁盘读写代价更低
     - B+树的内部节点并没有指向关键字具体信息的指针，因此其内部节点相对B树更小
     - 把所有同一内部节点的关键字存放在同一盘块中，那么盘块所能容纳的关键字数量也越多
     - 读取相同的数据量，io次数相对减少
   - B+树的查询效率更加稳定
   - B+树只需要去遍历叶子节点就可以实现整棵树的遍历，遍历效率高
-- Mysql 默认的隔离级别是什么？在 Innodb 的可重复读的情况下可以解决幻读的情况吗？（字节）
+### Mysql 默认的隔离级别是什么？在 Innodb 的可重复读的情况下可以解决幻读的情况吗？（字节）
   - 可重复读
   - MySQL可重复读的隔离级别中并不是完全解决了幻读的问题，而是解决了读数据情况下的幻读问题。而对于修改的操作依旧存在幻读问题。
-- 如何解决幻读？
+### 如何解决幻读？
   - 第一种方式 使用串行化读的隔离级别
   - 第二种方式 MVCC+next-key locks：next-key locks由record locks(索引加锁) 和 gap locks(间隙锁，每次锁住的不光是需要使用的数据，还会锁住这些数据附近的数据)
-- 如何对数据库进行分库分表，不允许停止服务
+### 如何对数据库进行分库分表，不允许停止服务
   - 第一阶段： 编写代理层和DAO层，代理层动态开关，决定写的是新表还是旧表，此时流量仍然是访问旧表
     - <img src="https://user-images.githubusercontent.com/31843331/152716838-883162bd-cdaf-4d01-b2ef-74b34d8099e4.png" width = "300" height = "300" alt="图片名称" />
   - 第二阶段： 开启双写，增量数据同时在旧表和新表进行新增和修改，日志或者临时表写入新表id的起始值，旧表中小于这个id值的数据就是存量数据
@@ -546,32 +1151,851 @@ mysqldump -u username -p database_name > backup.sql
   - 即从库只应用完成io_thread内容即可无需等到sql_thread的执行完成
 - mysql 事务原子性怎么实现的
 - 分库分表策略
-- 分表键和查询条件不一致咋整
-- 缓存和数据库的一致性怎么保证,当不一致的时候如何解决
+### 分表键和查询条件不一致咋整
+#### 分表键和查询条件不一致怎么办
+
+---
+
+#### 一、先理解问题场景
+
+```
+假设订单表按 user_id 分片：
+  orders_0 → user_id % 4 = 0
+  orders_1 → user_id % 4 = 1
+  orders_2 → user_id % 4 = 2
+  orders_3 → user_id % 4 = 3
+
+正常查询（带分表键）：
+  SELECT * FROM orders WHERE user_id = 123;
+  → 直接路由到 orders_3 ✅ 只查一张表
+
+非正常查询（不带分表键）：
+  SELECT * FROM orders WHERE order_no = 'SN202401010001';
+  SELECT * FROM orders WHERE status = 'paid';
+  → 不知道去哪张表找 ❌ 只能全部扫描
+```
+
+```
+全分片扫描的代价：
+  4 张表还好
+  分了 64 张表 → 同时查 64 张表
+  分了 1024 张表 → 同时查 1024 张表
+  每次查询都是全量扫描，性能极差
+```
+
+---
+
+#### 二、解决方案一：建立映射表（索引表）
+
+用一张单独的表记录**其他查询条件 → 分表键**的映射关系：
+
+```sql
+-- 映射表（不分片，单独存储）
+CREATE TABLE order_index (
+    order_no  VARCHAR(64),    -- 其他查询条件
+    user_id   BIGINT,         -- 分表键
+    PRIMARY KEY (order_no),
+    INDEX idx_user_id (user_id)
+);
+```
+
+##### 查询流程
+
+```
+业务方用 order_no 查订单：
+
+第一步：查映射表，拿到 user_id
+  SELECT user_id FROM order_index WHERE order_no = 'SN202401010001';
+  → user_id = 123
+
+第二步：用 user_id 路由到正确分片
+  123 % 4 = 3 → orders_3
+
+第三步：查目标分片
+  SELECT * FROM orders_3 WHERE order_no = 'SN202401010001';
+  → 返回结果 ✅
+
+总共两次查询，精准定位，无全表扫描
+```
+
+##### 写入时同步维护映射表
+
+```java
+@Transactional
+public void createOrder(Order order) {
+    // 1. 写入分片表
+    orderMapper.insert(order);  // 路由到 orders_3
+
+    // 2. 同步写入映射表
+    orderIndexMapper.insert(new OrderIndex(
+        order.getOrderNo(),
+        order.getUserId()
+    ));
+}
+```
+
+##### 映射表的问题
+
+```
+问题：映射表本身成为单点瓶颈
+  → 所有查询都要先查映射表，高并发下压力大
+
+解决：
+  映射表加 Redis 缓存
+  order_no → user_id 缓存到 Redis
+  缓存命中直接拿 user_id，不查 DB
+```
+
+---
+
+#### 三、解决方案二：基因法（冗余分表键信息）
+
+在生成 order_no 时，把 user_id 的路由信息**编码进去**，查询时从 order_no 解析出分片信息：
+
+```
+设计 order_no 格式：
+
+  SN + 时间戳 + user_id后4位 + 随机数
+
+  例：user_id = 123456
+      order_no = SN20240101_6789_1234 56_0023
+                                        ↑
+                                  user_id 后两位 = 56
+                                  56 % 4 = 0 → 路由到 orders_0
+```
+
+##### 查询时直接解析路由
+
+```java
+public Order getByOrderNo(String orderNo) {
+    // 从 order_no 中提取路由基因
+    String gene = orderNo.substring(15, 17);  // 提取 user_id 后两位
+    int shardIndex = Integer.parseInt(gene) % 4;
+
+    // 直接路由到对应分片，无需查映射表
+    return orderMapper.getByOrderNo(shardIndex, orderNo);
+}
+```
+
+```
+优点：
+  不需要映射表，少一次查询
+  order_no 本身携带路由信息
+
+缺点：
+  order_no 生成规则复杂，需要提前设计好
+  后期分片数变化，老数据解析规则会对不上
+  对业务有侵入性
+```
+
+---
+
+#### 四、解决方案三：冗余写入多份
+
+同一条数据**按不同维度写入多张表**：
+
+```
+场景：订单既要按 user_id 查，又要按 merchant_id 查
+
+写入时冗余两份：
+  orders_by_user     → 按 user_id 分片（用户端查自己的订单）
+  orders_by_merchant → 按 merchant_id 分片（商家端查自己店铺的订单）
+```
+
+```java
+@Transactional
+public void createOrder(Order order) {
+    // 按 user_id 写一份
+    orderByUserMapper.insert(order);      // 路由到 user 分片
+
+    // 按 merchant_id 再写一份
+    orderByMerchantMapper.insert(order);  // 路由到 merchant 分片
+}
+```
+
+```
+查询时直接路由：
+  用户查自己的订单   → orders_by_user     WHERE user_id = ?
+  商家查店铺订单     → orders_by_merchant WHERE merchant_id = ?
+
+优点：查询时直接路由，无需二次查询
+缺点：存储翻倍，写入需要保证两份数据一致性
+```
+
+---
+
+#### 五、解决方案四：ES 承接非分表键查询
+
+把数据同步到 Elasticsearch，复杂条件查询走 ES：
+
+```
+架构：
+
+写入数据
+  ↓
+MySQL 分片表（按 user_id 分片）
+  ↓ binlog 同步（Canal/Flink）
+Elasticsearch（全量索引，支持任意字段查询）
+
+查询路由：
+  带 user_id   → 直接走 MySQL 分片（精准快速）
+  不带 user_id → 走 ES 查询（灵活支持任意条件）
+               → ES 返回 order_id 列表
+               → 再用 order_id 回 MySQL 查完整数据
+```
+
+```java
+public List<Order> searchOrders(OrderQuery query) {
+    if (query.getUserId() != null) {
+        // 有分表键，直接路由 MySQL
+        return orderMapper.getByUserId(query.getUserId());
+    } else {
+        // 无分表键，走 ES
+        List<Long> orderIds = esOrderService.search(query);
+        return orderMapper.getByIds(orderIds);
+    }
+}
+```
+
+```
+优点：
+  ES 天然支持全文检索、多条件组合查询
+  MySQL 只负责精准查询，各司其职
+
+缺点：
+  引入 ES，架构复杂度增加
+  数据同步有延迟（秒级）
+  需要保证 MySQL 和 ES 数据一致性
+```
+
+---
+
+#### 六、四种方案对比
+
+| 方案 | 额外查询 | 存储开销 | 实时性 | 复杂度 | 适合场景 |
+|------|---------|---------|--------|--------|---------|
+| 映射表 | 多一次 DB 查询 | 小 | 实时 | 低 | 查询维度少（1~2个） |
+| 基因法 | 无 | 无 | 实时 | 中 | 提前规划，查询维度固定 |
+| 冗余写入 | 无 | 翻倍 | 实时 | 中 | 写少读多，维度固定 |
+| ES 承接 | 多一次 ES 查询 | 大 | 秒级延迟 | 高 | 查询条件复杂多变 |
+
+---
+
+#### 七、选型建议
+
+```
+查询维度固定（1~2个）且数据量不大
+  → 映射表 + Redis 缓存
+
+提前规划好，order_no 能编码路由信息
+  → 基因法（最优雅，无额外查询）
+
+写入不频繁，查询维度固定（如买家/卖家双视角）
+  → 冗余写入
+
+查询条件复杂多变（后台管理、报表、搜索）
+  → ES 承接非分表键查询
+```
+
+> **核心：分表键选好是前提，尽量让 80% 的查询都带分表键。剩下 20% 不带分表键的查询，用映射表或 ES 兜底，避免全分片扫描。**
+
+### 缓存和数据库的一致性怎么保证,当不一致的时候如何解决
   - [refer](https://www.processon.com/view/link/620af9b50e3e7429dd02be21)
 
-- innodb是如何存储数据的
+### innodb是如何存储数据的
   - [refer](https://mp.weixin.qq.com/s/665zAn_PuTqAl_rJa_5Ilg)
   
-- redolog 落盘
+### redolog 落盘
   - https://blog.csdn.net/weixin_40471676/article/details/119732738
 
-- mysql主备如何保证数据同步 
+### mysql主备如何保证数据同步 
   - https://www.processon.com/view/link/620f131c1efad406e7332e92
 
-- show processlist 命令详解 
+### show processlist 命令详解 
   - https://blog.csdn.net/dhfzhishi/article/details/81263084
+#### SHOW PROCESSLIST 命令详解
 
-- 如何判断数据库是否出问题了 
+---
+
+#### 一、是什么
+
+```sql
+-- 查看当前 MySQL 所有连接线程的状态
+SHOW PROCESSLIST;
+
+-- 显示完整 SQL（不截断）
+SHOW FULL PROCESSLIST;
+```
+
+```
+作用：
+  实时查看哪些连接在执行什么操作
+  排查慢查询、锁等待、连接堆积等问题
+  是数据库问题排查的第一现场
+```
+
+---
+
+#### 二、输出字段详解
+
+```sql
+SHOW FULL PROCESSLIST;
+
+-- 输出示例：
++------+------+-----------+--------+---------+------+------------------------+------------------+
+| Id   | User | Host      | db     | Command | Time | State                  | Info             |
++------+------+-----------+--------+---------+------+------------------------+------------------+
+| 101  | app  | 10.0.0.1  | mydb   | Query   | 0    | executing              | SELECT * FROM... |
+| 102  | app  | 10.0.0.2  | mydb   | Query   | 30   | Waiting for lock       | UPDATE orders... |
+| 103  | app  | 10.0.0.3  | mydb   | Sleep   | 600  |                        | NULL             |
+| 104  | root | localhost | mydb   | Query   | 120  | Copying to tmp table   | SELECT * FROM... |
++------+------+-----------+--------+---------+------+------------------------+------------------+
+```
+
+##### Id（线程 ID）
+
+```
+每个连接的唯一标识
+排查到问题线程后，用这个 ID 执行 KILL
+
+KILL 102;        -- 终止 102 号线程的查询，保留连接
+KILL QUERY 102;  -- 只终止查询，不断开连接
+```
+
+##### User（用户名）
+
+```
+发起连接的数据库用户
+可以判断是哪个应用或服务发来的请求
+
+system user  → MySQL 内部线程（主从复制 IO/SQL 线程）
+root         → 通常是 DBA 或运维操作
+app          → 业务应用
+```
+
+##### Host（来源地址）
+
+```
+格式：IP:端口
+
+10.0.0.1:52345  → 来自应用服务器
+localhost       → 本机连接
+
+通过 IP 可以定位是哪台应用服务器发来的请求
+```
+
+##### db（当前数据库）
+
+```
+当前连接使用的数据库
+NULL 表示没有选择数据库
+```
+
+##### Command（命令类型）
+
+```
+Query    → 正在执行 SQL 查询      ← 重点关注
+Sleep    → 空闲连接，等待客户端发命令
+Connect  → 正在建立连接
+Execute  → 正在执行预处理语句
+Quit     → 正在断开连接
+
+Sleep 时间过长（几百秒）→ 连接池没有回收，浪费连接资源
+```
+
+##### Time（持续时间，单位秒）
+
+```
+当前 Command 已持续的秒数
+
+Query  + Time 很大  → 慢查询，需要排查
+Sleep  + Time 很大  → 僵尸连接，可以 KILL
+Lock   + Time 很大  → 锁等待，需要找持锁者
+
+Time > 30s  → 需要关注
+Time > 300s → 必须处理
+```
+
+##### State（线程状态）
+
+```
+最关键的字段，反映线程当前在做什么
+```
+
+常见 State 值及含义：
+
+```
+State                          含义                    处理
+──────────────────────────────────────────────────────────────────
+executing                    正在执行查询               正常
+Waiting for lock             等待表锁                  找持锁者 KILL
+Waiting for row lock         等待行锁                  找持锁者 KILL
+Copying to tmp table         结果集写入临时表            SQL 需优化（GROUP BY/ORDER BY 无索引）
+Sorting result               对结果排序                SQL 需优化（无索引排序）
+Sending data                 向客户端发送数据            结果集过大，考虑分页
+Opening tables               正在打开表                 表数量过多或表锁竞争
+Locked                       被锁住                    找持锁者 KILL
+Creating sort index          创建排序索引               filesort，SQL 需优化
+init                         初始化查询                 正常，很快结束
+statistics                   计算执行计划统计信息         正常
+NULL / 空                    Sleep 状态，无操作          正常
+```
+
+##### Info（正在执行的 SQL）
+
+```
+SHOW PROCESSLIST    → SQL 超过 100 字符会截断
+SHOW FULL PROCESSLIST → 显示完整 SQL
+
+NULL → Sleep 状态，没有执行 SQL
+```
+
+---
+
+#### 三、实战排查场景
+
+##### 场景一：排查慢查询
+
+```sql
+-- 找出执行超过 10 秒的查询
+SELECT id, user, host, db, time, state, info
+FROM information_schema.processlist
+WHERE command = 'Query'
+  AND time > 10
+ORDER BY time DESC;
+
+-- 输出：
+-- id=104, time=120, state='Copying to tmp table'
+-- info='SELECT * FROM orders GROUP BY status ORDER BY created_at'
+
+-- 分析：state 是 Copying to tmp table，说明有大量数据写临时表
+-- 优化：给 status 和 created_at 加联合索引
+```
+
+##### 场景二：排查锁等待
+
+```sql
+-- 找出等锁的线程
+SELECT id, user, time, state, info
+FROM information_schema.processlist
+WHERE state LIKE '%lock%'
+ORDER BY time DESC;
+
+-- 输出：
+-- id=102, time=30, state='Waiting for row lock'
+-- info='UPDATE orders SET status=? WHERE id=888'
+
+-- 说明：102 号线程在等待 id=888 的行锁
+-- 需要找到持有这把锁的线程
+```
+
+```sql
+-- 找持锁者
+SELECT
+    r.trx_id             AS waiting_trx_id,
+    r.trx_mysql_thread_id AS waiting_thread,
+    b.trx_id             AS blocking_trx_id,
+    b.trx_mysql_thread_id AS blocking_thread,
+    b.trx_started        AS blocking_started,
+    TIMESTAMPDIFF(SECOND, b.trx_started, NOW()) AS blocking_seconds
+FROM information_schema.innodb_lock_waits w
+JOIN information_schema.innodb_trx r ON r.trx_id = w.requesting_trx_id
+JOIN information_schema.innodb_trx b ON b.trx_id = w.blocking_trx_id;
+
+-- 找到持锁线程 id=101，持锁已 300 秒
+-- KILL 101;  ← kill 掉，释放锁
+```
+
+##### 场景三：排查连接堆积
+
+```sql
+-- 统计各状态连接数
+SELECT command, state, COUNT(*) AS cnt
+FROM information_schema.processlist
+GROUP BY command, state
+ORDER BY cnt DESC;
+
+-- 输出：
+-- Sleep   NULL                    180   ← 大量空闲连接
+-- Query   Waiting for row lock     45   ← 大量锁等待
+-- Query   Copying to tmp table     12   ← 大量临时表操作
+
+-- 180 个 Sleep 连接 → 连接池配置过大，或连接没有及时释放
+-- 45 个锁等待     → 有长事务持锁，找到持锁者 KILL
+```
+
+##### 场景四：批量 KILL 问题连接
+
+```sql
+-- 生成 KILL 语句（Sleep 超过 600 秒的僵尸连接）
+SELECT CONCAT('KILL ', id, ';')
+FROM information_schema.processlist
+WHERE command = 'Sleep'
+  AND time > 600;
+
+-- 输出：
+-- KILL 103;
+-- KILL 107;
+-- KILL 115;
+
+-- 复制输出批量执行
+```
+
+---
+
+#### 四、information_schema.processlist 更灵活
+
+```sql
+-- SHOW PROCESSLIST 不方便加条件筛选
+-- 用 information_schema.processlist 代替，支持 WHERE/GROUP BY
+
+-- 查找执行时间最长的前10个查询
+SELECT id, user, host, db, time, state,
+       SUBSTR(info, 1, 100) AS sql_preview
+FROM information_schema.processlist
+WHERE command != 'Sleep'
+ORDER BY time DESC
+LIMIT 10;
+```
+
+---
+
+#### 五、performance_schema 更详细
+
+```sql
+-- MySQL 5.7+ 推荐用 performance_schema，信息更全
+SELECT
+    t.processlist_id      AS thread_id,
+    t.processlist_user    AS user,
+    t.processlist_host    AS host,
+    t.processlist_time    AS time,
+    t.processlist_state   AS state,
+    t.processlist_command AS command,
+    s.sql_text            AS full_sql      -- 完整 SQL，不截断
+FROM performance_schema.threads t
+LEFT JOIN performance_schema.events_statements_current s
+       ON t.thread_id = s.thread_id
+WHERE t.processlist_command != 'Sleep'
+ORDER BY t.processlist_time DESC;
+```
+
+---
+
+#### 六、监控告警建议
+
+```sql
+-- 以下情况需要立即告警：
+
+-- 1. 等锁线程数 > 10
+SELECT COUNT(*) FROM information_schema.processlist
+WHERE state LIKE '%lock%';
+
+-- 2. 执行超过 30 秒的查询
+SELECT COUNT(*) FROM information_schema.processlist
+WHERE command = 'Query' AND time > 30;
+
+-- 3. 总连接数接近上限
+SHOW STATUS LIKE 'Threads_connected';  -- 当前连接数
+SHOW VARIABLES LIKE 'max_connections'; -- 最大连接数
+-- 超过 80% 需要告警
+```
+
+---
+
+#### 七、总结
+
+```
+SHOW PROCESSLIST 排查步骤：
+
+发现问题
+  ↓
+SHOW FULL PROCESSLIST
+  ↓
+重点看：Command=Query + Time 较大的线程
+  ↓
+看 State：
+  Waiting for lock    → 找持锁者，KILL 持锁线程
+  Copying to tmp table → SQL 需要优化，加索引
+  Sorting result      → 排序无索引，加索引
+  Sending data        → 结果集太大，加分页
+  ↓
+定位 SQL（Info 字段）→ EXPLAIN 分析 → 优化
+```
+
+> **核心：`SHOW PROCESSLIST` 是数据库问题排查的第一步，Time 字段告诉你"慢了多久"，State 字段告诉你"卡在哪里"，Info 字段告诉你"是哪条 SQL"，三个字段结合就能快速定位大多数数据库问题。**
+
+
+### 如何判断数据库是否出问题了 
   - https://www.processon.com/view/link/620f17ce6376897c8c7bce60
 
-- mysql group by having 和 where 执行顺序 
+### mysql group by having 和 where 执行顺序 
   - 先执行where 再执行 group by 再执行 having
+#### MySQL 故障判断完整指南
 
+---
 
-- clickhouse的分布式是怎么工作的
+#### 一、快速连通性判断
 
-- 如何优化mysql, mysql慢查询如何优化，有哪些手段，
+##### 方法1：select 1（最简单）
+
+```sql
+select 1;
+```
+
+**能判断：**
+- 数据库进程是否存活
+- 网络连接是否正常
+
+**不能判断：**
+- 并发线程是否打满
+- 磁盘是否异常
+- 实际业务表是否可读写
+
+> ⚠️ select 1 返回正常 ≠ 数据库完全健康，只是最基础的存活检测。
+
+---
+
+#### 二、并发线程过多的判断
+
+##### 核心参数
+
+```sql
+-- 查看当前并发线程上限
+SHOW VARIABLES LIKE 'innodb_thread_concurrency';
+
+-- 建议设置范围
+SET GLOBAL innodb_thread_concurrency = 64; -- 推荐 64~128
+```
+
+##### 概念区分（重要）
+
+| 概念 | 含义 | 数量级 |
+|---|---|---|
+| **并发连接** | 已建立的连接数（show processlist） | 可达数千 |
+| **并发线程** | 真正在 CPU 上执行的线程 | 受 innodb_thread_concurrency 限制 |
+
+> 看到 `show processlist` 有 3000 个连接 ≠ 有 3000 个线程在跑，行锁/间隙锁等待的线程不计入并发线程数，也不消耗 CPU。
+
+##### 方法2：查表检测
+
+```sql
+-- 建立专用健康检测表
+CREATE TABLE mysql.health_check (
+    id  INT PRIMARY KEY,
+    t_modified TIMESTAMP
+);
+
+-- 执行查表检测
+SELECT * FROM mysql.health_check;
+```
+
+**比 select 1 多检测了什么：**
+- 当并发线程数已满，新请求会排队
+- `select 1` 是内部操作不进线程池，所以仍会成功
+- `select * from mysql.health_check` 需要真正进入 InnoDB 引擎执行，能检测出线程打满的问题
+
+##### 模拟并发线程打满（测试验证）
+
+```sql
+-- session1
+SELECT sleep(100) FROM t;
+
+-- session2
+SELECT sleep(100) FROM t;
+
+-- session3（此时若 innodb_thread_concurrency=2，这条会被阻塞）
+SELECT sleep(100) FROM t;
+```
+
+---
+
+#### 三、数据库更新能力的判断
+
+##### 方法3：更新检测（最精准）
+
+```sql
+-- 建表
+CREATE TABLE mysql.health_check (
+    id         INT            PRIMARY KEY,
+    t_modified TIMESTAMP      DEFAULT NOW()
+);
+
+-- 健康检测 SQL
+INSERT INTO mysql.health_check (id, t_modified)
+VALUES (@@server_id, NOW())
+ON DUPLICATE KEY UPDATE t_modified = NOW();
+```
+
+##### 为什么用 @@server_id？
+
+```
+主库  server_id = 1  → 插入 id=1
+备库  server_id = 2  → 插入 id=2
+
+如果两个库都用固定 id=1
+→ 备库同步主库检测语句时会发生冲突
+→ @@server_id 保证主备库各自独立，互不干扰
+```
+
+##### 这条语句能检测出什么问题？
+
+| 故障类型 | select 1 | 查表检测 | 更新检测 |
+|---|---|---|---|
+| 进程挂了 | ✅ 能检测 | ✅ | ✅ |
+| 并发线程打满 | ❌ 检测不到 | ✅ 能检测 | ✅ |
+| binlog 磁盘满 | ❌ | ❌ | ✅ 能检测 |
+| 数据写入异常 | ❌ | ❌ | ✅ 能检测 |
+
+---
+
+#### 四、磁盘故障的判断
+
+##### binlog 磁盘满的特征
+
+```
+现象：
+  ✅ SELECT 查询正常返回
+  ❌ UPDATE / INSERT / DELETE 全部阻塞
+  ❌ 事务 COMMIT 被阻塞
+
+原因：
+  写 binlog 是事务提交的必要步骤
+  磁盘满 → binlog 写不进去 → 事务无法提交
+```
+
+##### 判断命令
+
+```bash
+# 查看磁盘使用率
+df -h
+
+# 查看 binlog 所在目录大小
+du -sh /var/lib/mysql/
+
+# 查看 binlog 文件列表
+SHOW BINARY LOGS;
+```
+
+##### IO 利用率 100% 不等于数据库"慢"
+
+```
+IO 利用率 = 100%
+    ↓ 代表的含义
+IO 资源满负荷，每个请求仍有机会获取 IO 执行
+
+正确判断逻辑：
+  IO 100% + 健康检测 update 超时 → 数据库确实有问题
+  IO 100% + 健康检测 update 正常返回 → 数据库仍在正常服务
+```
+
+---
+
+#### 五、performance_schema 精细化 IO 监控（MySQL 5.6+）
+
+##### 开启监控
+
+```sql
+-- 开启 file 级别 IO 统计
+UPDATE performance_schema.setup_instruments
+SET ENABLED = 'YES', TIMED = 'YES'
+WHERE NAME LIKE 'wait/io/file/%';
+
+UPDATE performance_schema.setup_consumers
+SET ENABLED = 'YES'
+WHERE NAME LIKE '%events_waits%';
+```
+
+##### 核心监控表
+
+```sql
+SELECT * FROM performance_schema.file_summary_by_event_name
+WHERE event_name IN (
+    'wait/io/file/innodb/innodb_log_file',  -- redo log
+    'wait/io/file/sql/binlog'               -- binlog
+);
+```
+
+##### 统计维度详解
+
+| 字段 | 含义 | 用途 |
+|---|---|---|
+| `COUNT_READ` | 读请求次数 | 判断读 IO 压力 |
+| `SUM_TIMER_READ` | 读请求总耗时（皮秒） | 判断读是否慢 |
+| `COUNT_WRITE` | 写请求次数 | 判断写 IO 压力 |
+| `SUM_TIMER_WRITE` | 写请求总耗时 | 判断写是否慢 |
+| `SUM_TIMER_WAIT` | 总 IO 等待时间 | 综合 IO 健康度 |
+| `MAX_TIMER_WAIT` | 单次最大 IO 等待 | 发现毛刺和抖动 |
+
+##### 实战：判断 redo log 是否有 IO 瓶颈
+
+```sql
+SELECT
+    event_name,
+    COUNT_WRITE,
+    SUM_TIMER_WRITE / 1000000000000 AS write_sec,   -- 换算成秒
+    MAX_TIMER_WRITE / 1000000000000 AS max_write_sec
+FROM performance_schema.file_summary_by_event_name
+WHERE event_name = 'wait/io/file/innodb/innodb_log_file';
+```
+
+##### 异常基线检测（自动化监控思路）
+
+```sql
+-- 记录上一次的统计值，与当前值做 diff
+-- 若两次采集间隔内 SUM_TIMER_WAIT 增长过快 → IO 有问题
+
+SELECT
+    event_name,
+    SUM_TIMER_WAIT - @last_wait AS delta_wait  -- 与上次对比
+FROM performance_schema.file_summary_by_event_name
+WHERE event_name LIKE 'wait/io/file/%';
+
+-- 采集完后清零，方便下次对比
+TRUNCATE TABLE performance_schema.file_summary_by_event_name;
+```
+
+---
+
+#### 六、综合判断流程
+
+```
+数据库出现问题？
+        ↓
+Step1: select 1
+  ❌ 超时 → 进程挂了/网络故障 → 重启或检查网络
+  ✅ 正常 → 继续往下
+
+Step2: select * from mysql.health_check
+  ❌ 超时 → 并发线程打满
+           → 检查 show processlist / 是否有大查询 / 调整 innodb_thread_concurrency
+  ✅ 正常 → 继续往下
+
+Step3: insert ... health_check (更新检测)
+  ❌ 超时 → 写入异常
+           → 检查 binlog 磁盘是否满 / redo log 是否异常
+  ✅ 正常 → 继续往下
+
+Step4: performance_schema IO 监控
+  SUM_TIMER_WAIT 异常高 → 具体哪个文件 IO 慢 → 定向排查
+  MAX_TIMER_WAIT 有毛刺 → 偶发性 IO 抖动 → 检查存储设备
+```
+
+---
+
+#### 七、监控告警核心指标汇总
+
+| 监控项 | 告警阈值参考 | 说明 |
+|---|---|---|
+| binlog 磁盘使用率 | > 80% | 满了会阻塞所有写操作 |
+| 并发线程数 | > innodb_thread_concurrency × 80% | 接近上限需预警 |
+| 健康检测 update 响应时间 | > 1s | 超时说明写入有问题 |
+| redo log IO 等待 | MAX_TIMER_WAIT > 200ms | 存在 IO 瓶颈 |
+| 慢查询数量 | 突增 | 有锁或全表扫描 |
+| show processlist 中 waiting 数 | 大量 waiting for lock | 锁竞争严重 |
+
+### clickhouse的分布式是怎么工作的
+
+### 如何优化mysql, mysql慢查询如何优化，有哪些手段，
   - [如何定位慢查询](https://blog.csdn.net/qq_27276045/article/details/110020421)
   - [refer优化](https://blog.csdn.net/weixin_38805083/article/details/123061693)
 
