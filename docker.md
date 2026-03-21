@@ -1,27 +1,551 @@
-- DOCKER 是什么？
-- 如何使用DOCKER 技术创建与环境无关的容器系统？
-- DOCKERFILE 配置文件中的COPY 和ADD 指令有什么不同
-- DOCKER 映像（IMAGE）是什么
-- DOCKER 容器（CONTAINER）是什么
-- DOCKER 中心（HUB）什么概念
-- 在任意给定时间点指出一个DOCKER 容器可能存在的运行阶段
-- 有什么方法确定一个DOCKER 容器运行状态
-- 在DOCKERFILE 配置文件中最常用的指令有哪些
-- 什么类型的应用（无状态性或有状态性）更适合DOCKER 容器技术
-- 解释基本DOCKER 应用流程
-- DOCKER IMAGE 和DOCKER LAYER (层) 有什么不同
-- 虚拟化技术是什么
-- 什么是孤儿卷及如何删除它
-- docker为什么是轻量级别的
-- docker run -v
-- docker rm
-- 虚拟机和普通容器的不同点？网络实现都有什么原理？
-- docker中copy, add的区别
-- docker中entrypoint和cmd的区别
+### Docker 是什么
+
+Docker 是一个开源的**容器化平台**，将应用程序及其所有依赖（代码、运行时、库、配置）打包进一个标准化的容器单元，实现"一次构建，到处运行"。
+
+与虚拟机不同，Docker 容器共享宿主机操作系统内核，不需要为每个容器启动完整 OS，启动时间从分钟级压缩到秒级。
+
+---
+
+### 如何创建与环境无关的容器系统
+
+核心思路是把**环境本身打包进镜像**，而不是依赖宿主机的环境：
+
+```dockerfile
+# 指定基础环境，不依赖宿主机
+FROM python:3.11-slim
+
+# 把依赖安装进镜像
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# 把代码打包进镜像
+COPY src/ /app/src/
+
+# 声明运行方式
+CMD ["python", "/app/src/main.py"]
+```
+
+**关键实践**
+
+- 用 `requirements.txt` / `package.json` 锁定依赖版本
+- 用环境变量（`ENV` / `-e`）管理配置差异，不硬编码
+- 用 `docker-compose.yml` 统一多服务的组合方式
+- 不同环境（开发/测试/生产）只改环境变量，镜像完全相同
+
+---
+
+### Dockerfile 中 COPY 和 ADD 的区别
+
+| 对比点 | COPY | ADD |
+|---|---|---|
+| 基本功能 | 复制本地文件到镜像 | 复制本地文件到镜像 |
+| 自动解压 | 不支持 | 支持 `.tar` 自动解压 |
+| 远程 URL | 不支持 | 支持从 URL 下载文件 |
+| 行为可预期性 | 完全透明 | 有隐式行为 |
+| 官方推荐 | ✓ 优先使用 | 仅在需要解压时使用 |
+
+```dockerfile
+# 推荐：明确复制文件
+COPY config.json /app/config.json
+
+# 需要解压时才用 ADD
+ADD archive.tar.gz /app/
+
+# 不推荐用 ADD 下载远程文件，用 RUN curl 替代
+RUN curl -o /app/file.zip https://example.com/file.zip
+```
+
+**原则**：能用 `COPY` 就用 `COPY`，行为透明可预期；`ADD` 只在需要自动解压 tar 包时使用。
+
+---
+
+### Docker Image（镜像）是什么
+
+镜像是一个**只读的模板**，包含运行应用所需的完整文件系统快照（OS 基础层 + 依赖 + 代码 + 配置）。
+
+镜像由多个**只读层（Layer）叠加**组成，每条 Dockerfile 指令生成一层：
+
+```
+┌─────────────────────┐
+│   CMD ["python"...] │  ← Layer 4（应用启动命令）
+├─────────────────────┤
+│   COPY src/ /app/   │  ← Layer 3（应用代码）
+├─────────────────────┤
+│   RUN pip install   │  ← Layer 2（依赖安装）
+├─────────────────────┤
+│   FROM python:3.11  │  ← Layer 1（基础镜像）
+└─────────────────────┘
+```
+
+相同的层在不同镜像间**共享复用**，节省存储空间。镜像本身不可修改，运行时在顶部叠加一个可写层形成容器。
+
+---
+
+### Docker Container（容器）是什么
+
+容器是镜像的**运行实例**，在镜像只读层之上叠加一个可写层（Container Layer）：
+
+```
+┌─────────────────────┐
+│   可写层（容器层）    │  ← 运行时写入的数据（临时）
+├─────────────────────┤
+│   镜像只读层 N       │
+│   镜像只读层 ...     │  ← 来自镜像，只读
+│   镜像只读层 1       │
+└─────────────────────┘
+```
+
+容器销毁后可写层随之消失，需要持久化的数据要挂载 Volume。同一镜像可以同时运行多个容器，互相隔离。
+
+---
+
+### Docker Hub 是什么
+
+Docker Hub 是官方的**镜像托管仓库**，类似 GitHub 之于代码，存放和分发 Docker 镜像：
+
+```bash
+# 从 Hub 拉取官方镜像
+docker pull nginx:latest
+docker pull python:3.11-slim
+
+# 推送自己的镜像到 Hub
+docker tag myapp:1.0 username/myapp:1.0
+docker push username/myapp:1.0
+```
+
+**分类**
+
+- **官方镜像**：由 Docker 官方维护，如 `nginx`、`mysql`、`python`
+- **认证镜像**：由可信厂商维护，如 `bitnami/redis`
+- **社区镜像**：个人或组织发布，格式为 `username/imagename`
+
+除 Docker Hub 外，还有私有仓库方案：Harbor、AWS ECR、阿里云 ACR 等。
+
+---
+
+### Docker 容器的运行阶段
+
+一个容器在生命周期中可能处于以下状态：
+
+```
+docker create
+      │
+      ▼
+  Created（已创建，未启动）
+      │
+  docker start
+      │
+      ▼
+  Running（运行中）
+      │
+  ┌───┴───────────────┐
+  │                   │
+docker pause      docker stop
+  │                   │
+  ▼                   ▼
+Paused（暂停）    Stopped/Exited（已停止）
+  │                   │
+docker unpause    docker start
+  │                   │
+  └───────┬───────────┘
+          ▼
+       Running
+          │
+      docker rm
+          │
+          ▼
+       Deleted（已删除）
+```
+
+| 状态 | 说明 |
+|---|---|
+| Created | 容器已创建，进程未启动 |
+| Running | 进程正在运行 |
+| Paused | 进程被冻结，CPU 暂停调度 |
+| Exited | 进程已退出，容器保留 |
+| Dead | 容器无法正常停止，需强制删除 |
+
+---
+
+### 如何确定 Docker 容器运行状态
+
+```bash
+# 查看所有运行中容器
+docker ps
+
+# 查看所有容器（包括已停止）
+docker ps -a
+
+# 查看单个容器详细信息（JSON 格式）
+docker inspect <container_id>
+
+# 精确提取运行状态
+docker inspect <container_id> --format='{{.State.Status}}'
+# 输出：running / exited / paused / dead
+
+# 查看容器资源实时占用
+docker stats <container_id>
+
+# 查看容器日志（排查为何退出）
+docker logs <container_id>
+docker logs --tail 100 -f <container_id>
+```
+
+---
+
+### Dockerfile 中最常用的指令
+
+```dockerfile
+# 指定基础镜像
+FROM python:3.11-slim
+
+# 设置环境变量
+ENV APP_ENV=production
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制文件
+COPY requirements.txt .
+COPY src/ ./src/
+
+# 执行构建命令（每条 RUN 生成一层，合并减少层数）
+RUN pip install --no-cache-dir -r requirements.txt \
+    && rm -rf /tmp/*
+
+# 声明对外端口
+EXPOSE 8080
+
+# 设置挂载点
+VOLUME ["/app/data"]
+
+# 容器启动时执行（不可被 docker run 覆盖）
+ENTRYPOINT ["python"]
+
+# 默认参数（可被 docker run 覆盖）
+CMD ["main.py"]
+```
+
+---
+
+### 无状态还是有状态应用更适合 Docker
+
+**无状态应用更适合 Docker**，原因如下：
+
+```
+无状态应用（推荐）          有状态应用（需额外处理）
+────────────────           ────────────────
+Web API 服务               数据库（MySQL、Redis）
+消息消费者                 文件存储服务
+定时任务                   需要持久化会话的应用
+```
+
+**无状态应用的优势**
+
+- 可以任意水平扩容，多个容器实例完全等价
+- 容器随时可以销毁重建，不丢失数据
+- 健康检查失败直接重启，无需迁移数据
+
+**有状态应用的处理方式**
+
+必须配合 Volume 持久化数据，且需要考虑数据一致性：
+
+```bash
+# 数据库容器必须挂载 Volume
+docker run -v mysql_data:/var/lib/mysql mysql:8.0
+```
+
+生产环境中数据库通常不建议容器化，或使用云厂商托管数据库服务。
+
+---
+
+### 基本 Docker 应用流程
+
+```
+1. 编写 Dockerfile
+        │
+        ▼
+2. docker build -t myapp:1.0 .
+   （构建镜像）
+        │
+        ▼
+3. docker push username/myapp:1.0
+   （推送到仓库，可选）
+        │
+        ▼
+4. docker pull username/myapp:1.0
+   （其他机器拉取）
+        │
+        ▼
+5. docker run -d -p 8080:8080 myapp:1.0
+   （运行容器）
+        │
+        ▼
+6. docker ps / docker logs
+   （查看状态和日志）
+        │
+        ▼
+7. docker stop / docker rm
+   （停止和清理）
+```
+
+---
+
+### Docker Image 和 Docker Layer 的区别
+
+**Layer（层）** 是构成镜像的最小单元，每条 Dockerfile 指令产生一层，层是**不可变的只读内容块**。
+
+**Image（镜像）** 是多个层按顺序叠加后的**完整视图**，加上元数据（环境变量、启动命令等）。
+
+```
+Image = Layer1 + Layer2 + Layer3 + ... + Metadata
+
+Layer1: FROM ubuntu        → 基础 OS 文件
+Layer2: RUN apt install    → 安装软件产生的文件变更
+Layer3: COPY app/ /app/    → 应用文件
+Layer4: CMD ["./app"]      → 元数据，不产生文件层
+```
+
+**层共享的价值**
+
+```
+镜像 A：Layer1(ubuntu) + Layer2(python) + Layer3(app-v1)
+镜像 B：Layer1(ubuntu) + Layer2(python) + Layer3(app-v2)
+
+Layer1 和 Layer2 在磁盘上只存一份，两个镜像共享
+```
+
+---
+
+### 虚拟化技术是什么
+
+虚拟化是在物理硬件之上创建**隔离的虚拟计算环境**的技术，让一台物理机运行多个独立系统。
+
+**主要类型**
+
+```
+硬件虚拟化（Type 1 Hypervisor）
+物理机 → Hypervisor（VMware ESXi、KVM）→ 多个完整虚拟机
+每个 VM 有独立内核，隔离性最强
+
+硬件虚拟化（Type 2 Hypervisor）
+物理机 → 宿主 OS → Hypervisor（VirtualBox）→ 多个 VM
+跑在操作系统之上，性能略低
+
+容器虚拟化
+物理机 → 宿主 OS → 容器引擎（Docker）→ 多个容器
+共享宿主内核，最轻量，隔离性相对弱
+```
+
+---
+
+### 什么是孤儿卷及如何删除
+
+**孤儿卷（Orphan Volume）** 是指关联的容器已被删除，但 Volume 仍然存在的数据卷，长期积累会占用大量磁盘空间。
+
+```bash
+# 查看所有 Volume
+docker volume ls
+
+# 查看孤儿卷（未被任何容器使用的 Volume）
+docker volume ls -f dangling=true
+
+# 删除单个孤儿卷
+docker volume rm <volume_name>
+
+# 批量删除所有孤儿卷（谨慎使用）
+docker volume prune
+
+# 一次性清理所有未使用资源（容器、网络、镜像、卷）
+docker system prune -a --volumes
+```
+
+---
+
+### Docker 为什么是轻量级的
+
+与虚拟机相比，Docker 轻量的原因在于**不携带完整操作系统**：
+
+```
+虚拟机
+┌──────────────────────┐
+│  App + 依赖           │
+│  Guest OS（完整内核） │  ← 每个 VM 独立一套 OS，占用 GB 级空间
+│  Hypervisor          │
+│  物理机硬件           │
+└──────────────────────┘
+
+Docker 容器
+┌──────────────────────┐
+│  App + 依赖           │
+│  容器（共享内核）     │  ← 只打包应用和依赖，MB 级
+│  Docker Engine       │
+│  宿主机 OS 内核       │  ← 所有容器共用同一个内核
+│  物理机硬件           │
+└──────────────────────┘
+```
+
+| 对比维度 | 虚拟机 | Docker 容器 |
+|---|---|---|
+| 启动时间 | 分钟级 | 秒级 |
+| 镜像大小 | GB 级 | MB 级 |
+| 内存占用 | 数百 MB 起 | 数 MB 起 |
+| 内核 | 每个 VM 独立 | 共享宿主内核 |
+
+---
+
+### docker run -v 的用法
+
+`-v` 用于挂载 Volume 或绑定宿主机目录，实现**数据持久化**和**开发热更新**：
+
+```bash
+# 挂载命名 Volume（推荐，数据持久化）
+docker run -v mysql_data:/var/lib/mysql mysql:8.0
+
+# 绑定挂载（Bind Mount，将宿主机目录挂进容器）
+docker run -v /host/path:/container/path myapp
+
+# 开发场景：挂载代码目录，实现热更新
+docker run -v $(pwd)/src:/app/src myapp
+
+# 只读挂载（容器内不能修改）
+docker run -v $(pwd)/config:/app/config:ro myapp
+```
+
+**三种挂载方式对比**
+
+| 方式 | 语法 | 适用场景 |
+|---|---|---|
+| 命名 Volume | `-v vol_name:/path` | 生产数据持久化 |
+| Bind Mount | `-v /host:/container` | 开发调试、配置注入 |
+| tmpfs | `--tmpfs /path` | 临时敏感数据，不落磁盘 |
+
+---
+
+### docker rm 的用法
+
+```bash
+# 删除已停止的容器
+docker rm <container_id>
+
+# 强制删除运行中的容器
+docker rm -f <container_id>
+
+# 删除容器同时删除关联的匿名 Volume
+docker rm -v <container_id>
+
+# 批量删除所有已停止的容器
+docker container prune
+
+# 删除所有容器（运行中 + 已停止）
+docker rm -f $(docker ps -aq)
+```
+
+---
+
+### 虚拟机和容器的不同点及网络原理
+
+**核心区别**
+
+| 对比维度 | 虚拟机 | Docker 容器 |
+|---|---|---|
+| 隔离级别 | 硬件级隔离 | 进程级隔离（namespace）|
+| 内核 | 独立内核 | 共享宿主内核 |
+| 启动速度 | 分钟级 | 秒级 |
+| 资源开销 | 重（GB 级）| 轻（MB 级）|
+| 安全性 | 更高 | 相对较低 |
+| 可移植性 | 镜像大，移植慢 | 镜像小，移植快 |
+
+**网络实现原理**
+
+*虚拟机网络*：通过 Hypervisor 模拟完整网卡，有 NAT、桥接、Host-only 三种模式，每个 VM 有独立 IP，网络栈完全独立。
+
+*Docker 网络*：基于 Linux **Network Namespace** 实现隔离，通过 **veth pair**（虚拟网卡对）连接容器和宿主机：
+
+```
+容器内部                    宿主机
+──────────                 ──────────
+eth0（veth一端）◄──────────► veth0（veth另一端）
+     │                           │
+     │                      docker0（虚拟网桥）
+     │                           │
+     └──────────────────────► 宿主机网卡 → 外网
+```
+
+Docker 默认网络模式：
+
+```bash
+bridge    # 默认，容器通过 docker0 网桥通信
+host      # 直接使用宿主机网络，性能最好，隔离性最差
+none      # 无网络
+overlay   # 跨主机容器通信（Swarm/K8s 使用）
+```
+
+---
+
+### COPY 和 ADD 的区别
+
+与前文 Dockerfile 章节内容一致，核心区别：
+
+```dockerfile
+# COPY：只做文件复制，行为透明
+COPY app.tar.gz /tmp/          # 直接复制压缩包，不解压
+
+# ADD：有额外能力
+ADD app.tar.gz /app/           # 自动解压到 /app/
+ADD https://example.com/f.zip /tmp/  # 支持远程 URL
+
+# 官方建议：只有需要自动解压时才用 ADD，其余一律 COPY
+```
+
+---
+
+### ENTRYPOINT 和 CMD 的区别
+
+两者都定义容器启动时执行的命令，但职责不同：
+
+**CMD**：定义**默认命令**，可以被 `docker run` 末尾的参数完全覆盖
+
+**ENTRYPOINT**：定义**固定入口**，`docker run` 的参数作为追加参数，而非替换
+
+```dockerfile
+# 只有 CMD
+CMD ["python", "main.py"]
+# docker run myapp              → 执行 python main.py
+# docker run myapp bash         → 执行 bash（CMD 被覆盖）
+
+# 只有 ENTRYPOINT
+ENTRYPOINT ["python"]
+# docker run myapp              → 执行 python（无参数）
+# docker run myapp main.py      → 执行 python main.py
+
+# ENTRYPOINT + CMD 组合（最佳实践）
+ENTRYPOINT ["python"]
+CMD ["main.py"]
+# docker run myapp              → 执行 python main.py
+# docker run myapp other.py     → 执行 python other.py（只替换 CMD 部分）
+```
+
+**典型使用场景**
+
+```dockerfile
+# 把容器做成一个命令行工具
+ENTRYPOINT ["ffmpeg"]
+CMD ["--help"]
+# docker run myffmpeg -i input.mp4 output.mp3
+# → 执行 ffmpeg -i input.mp4 output.mp3
+```
+
+| 对比点 | CMD | ENTRYPOINT |
+|---|---|---|
+| 能否被覆盖 | 完全覆盖 | 需要 `--entrypoint` 才能覆盖 |
+| 定位 | 默认参数 | 固定执行入口 |
+| 组合使用 | 提供默认参数 | 提供固定命令 |
+| 推荐场景 | 灵活的默认行为 | 容器作为可执行程序 |
 
 
 
-# entrypoint和cmd的区别
+## entrypoint和cmd的区别
 
 在 Dockerfile 中，`CMD` 和 `ENTRYPOINT` 都是用于定义容器启动时执行的命令，但它们的行为和用途有显著区别。以下是具体对比：
 
