@@ -211,6 +211,47 @@ change buffer 和 二级索引、唯一索引有什么关系呢？
 - (八)ref列：显示索引的哪一列被使用了，如果可能的话，是一个常数
 - (九)rows列(每张表有多少行被优化器查询)
 - (十)Extra列：扩展属性，但是很重要的信息
+
+**Extra 列常见值说明**：
+
+| 值 | 含义 | 优化建议 |
+|---|---|---|
+| **Using index** | 使用覆盖索引，直接从索引返回数据，无需回表 | ✅ 好，性能优 |
+| **Using index condition** | 使用索引条件下推（ICP），将 WHERE 条件下推到存储引擎层过滤 | ✅ 好，MySQL 5.6+ 优化 |
+| **Using index for group-by** | 使用索引完成 GROUP BY 或 DISTINCT 操作 | ✅ 好，索引覆盖 |
+| **Using index for skip scan** | 使用索引跳跃扫描 | ⚠️ 一般 |
+| **Using MRR** | 使用 Multi-Range Read 优化，减少随机 IO | ✅ 正常优化 |
+| **Using union** | Index Merge 使用 union 算法合并多个索引 | ✅ 正常 |
+| **Using sort_union** | Index Merge 使用 sort_union 算法合并索引 | ✅ 正常 |
+| **Using intersect** | Index Merge 使用 intersect 算法取交集 | ✅ 正常 |
+| **Distinct** | 优化 DISTINCT，找到匹配行后立即停止搜索 | ✅ 正常 |
+| **Not exists** | 优化 NOT EXISTS 或 LEFT JOIN，找到匹配后不再搜索 | ✅ 正常 |
+| **No matching rows after const** | const 表没有匹配行 | ✅ 正常 |
+| **No tables used** | 查询没有 FROM 子句 | ✅ 正常 |
+| **Using where** | 使用 WHERE 条件过滤，需要注意是否伴随 ALL/index 类型 | ⚠️ 需结合 type 判断 |
+| **Using temporary** | 需要创建临时表存储结果，通常发生在 GROUP BY/ORDER BY 列无索引时 | ⚠️ 需优化 |
+| **Using filesort** | 需要额外排序操作，无法利用索引排序 | ⚠️ 需优化 |
+| **Range checked for each Record** | 未找到理想索引，每个记录都需要检查可用索引 | ⚠️ 性能差 |
+| **Using filesort,Using temporary** | 同时出现，查询需要临时表且需要排序 | ❌ 差，必须优化 |
+
+**Extra 效率判断**：
+- ✅ **好**：Using index、Using index condition、Using index for group-by、Using MRR、Using union/sort_union/intersect、Distinct、Not exists
+- ⚠️ **警告**：Using where、Using temporary、Using filesort、Range checked for each Record
+- ❌ **差**：Using filesort + Using temporary 组合，必须优化
+
+**type 列连接类型效率排序（从高到低）**：
+```
+system > const > eq_ref > ref > range > index > ALL
+```
+| 类型 | 含义 |
+|------|------|
+| **system** | 系统表，只有单行记录 |
+| **const** | 主键或唯一索引的等值查询，只匹配一行 |
+| **eq_ref** | 连接中使用主键或唯一索引，只匹配一行 |
+| **ref** | 非唯一索引的等值查询 |
+| **range** | 索引范围扫描（>, <, BETWEEN, IN 等） |
+| **index** | 全索引扫描，比 ALL 快 |
+| **ALL** | 全表扫描，性能最差，应尽量避免 |
 ## InnoDB索引底层实现？为什么使用b+树不适用b树？
 - [refer](https://blog.csdn.net/weixin_38054045/article/details/114024721?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164551017416780265482140%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=164551017416780265482140&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-2-114024721.pc_search_result_positive&utm_term=%E4%B8%BA%E4%BB%80%E4%B9%88b%2B%E6%A0%91%E5%87%8F%E5%B0%8F%E4%BA%86io&spm=1018.2226.3001.4187)
 - B+ 树的非叶子节点上只储存键值，而 B 树的非叶子节点上不仅储存键值还储存数据。
@@ -969,7 +1010,11 @@ SELECT * FROM orders IGNORE INDEX(idx_status) WHERE status = 'paid';
   - mysql中每个表都有一个聚簇索引（clustered index ），除此之外的表上的每个非聚簇索引都是二级索引，又叫辅助索引（secondary indexes）
   - 
 ### mysql 做过哪些优化
- #### 1. SQL 语句优化
+
+【有道云笔记】04.SQL优化.md
+https://share.note.youdao.com/s/TnWDz50Q
+
+#### 1. SQL 语句优化
 ##### 1.1 查询语句优化
 ###### 1.1.1 禁止使用 SELECT *
 增加 CPU、IO、内存、网络带宽消耗，无法使用覆盖索引，必须回表查询。
