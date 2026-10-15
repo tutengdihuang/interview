@@ -1,0 +1,55 @@
+- generic [ref=f11e3]:
+  - generic [ref=f11e5]:
+    - link [ref=f11e6] [cursor=pointer]:
+      - /url: //www.douyin.com/jingxuan
+    - generic [ref=f11e12]:
+      - generic [ref=f11e14]:
+        - link "精选" [ref=f11e18] [cursor=pointer]:
+          - /url: https://www.douyin.com/jingxuan?from_nav=1
+        - link "推荐" [ref=f11e25] [cursor=pointer]:
+          - /url: https://www.douyin.com/?recommend=1&from_nav=1
+        - link "AI抖音" [ref=f11e32] [cursor=pointer]:
+          - /url: https://www.douyin.com/aisearch?from_nav=1
+        - link "关注" [ref=f11e40] [cursor=pointer]:
+          - /url: https://www.douyin.com/follow?from_nav=1
+        - link "朋友" [ref=f11e47] [cursor=pointer]:
+          - /url: https://www.douyin.com/friend?from_nav=1
+        - link "我的" [ref=f11e54] [cursor=pointer]:
+          - /url: https://www.douyin.com/user/self?from_nav=1
+        - link "直播" [ref=f11e62] [cursor=pointer]:
+          - /url: https://live.douyin.com/?from_nav=1
+        - link "放映厅" [ref=f11e69] [cursor=pointer]:
+          - /url: https://www.douyin.com/vs?from_nav=1
+        - link "短剧" [ref=f11e76] [cursor=pointer]:
+          - /url: https://www.douyin.com/series?from_nav=1
+      - generic [ref=f11e82]:
+        - generic [ref=f11e84] [cursor=pointer]
+        - generic [ref=f11e88] [cursor=pointer]
+        - generic [ref=f11e92] [cursor=pointer]
+  - generic [ref=f11e95]:
+    - banner [ref=f11e99]:
+      - generic [ref=f11e101]:
+        - generic [ref=f11e105]:
+          - textbox "搜索你感兴趣的内容" [ref=f11e107]
+          - button "搜索" [ref=f11e109] [cursor=pointer]
+        - generic [ref=f11e116]:
+          - paragraph [ref=f11e123] [cursor=pointer]: 充值
+          - link [ref=f11e128] [cursor=pointer]:
+            - /url: ""
+            - paragraph [ref=f11e136]: 客户端
+          - paragraph [ref=f11e143] [cursor=pointer]: 壁纸
+          - list [ref=f11e144]:
+            - paragraph [ref=f11e154] [cursor=pointer]: 通知
+          - list [ref=f11e155]:
+            - paragraph [ref=f11e162] [cursor=pointer]: 消息
+          - paragraph [ref=f11e171] [cursor=pointer]: 投稿
+          - button [ref=f11e175] [cursor=pointer]:
+            - paragraph [ref=f11e177]: 登录
+    - generic [ref=f11e188]:
+      - generic [ref=f11e189] [cursor=pointer]: 综合
+      - generic [ref=f11e190] [cursor=pointer]: 视频
+      - generic [ref=f11e191] [cursor=pointer]: 用户
+      - generic [ref=f11e192] [cursor=pointer]: 直播
+      - generic [ref=f11e193] [cursor=pointer]: 多列
+      - generic [ref=f11e201] [cursor=pointer]: 单列
+      - generic [ref=f11e206]: 筛选

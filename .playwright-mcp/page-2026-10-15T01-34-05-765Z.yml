@@ -1,0 +1,181 @@
+- generic [active] [ref=f1e1]:
+  - button "开启读屏标签" [ref=f1e2]
+  - generic: 读屏标签已关闭
+  - generic [ref=f1e4]:
+    - generic [ref=f1e6]:
+      - link [ref=f1e7] [cursor=pointer]:
+        - /url: //www.douyin.com/jingxuan
+      - generic [ref=f1e13]:
+        - generic [ref=f1e15]:
+          - link "精选" [ref=f1e19] [cursor=pointer]:
+            - /url: https://www.douyin.com/jingxuan?from_nav=1
+          - link "推荐" [ref=f1e26] [cursor=pointer]:
+            - /url: https://www.douyin.com/?recommend=1&from_nav=1
+          - link "AI抖音" [ref=f1e33] [cursor=pointer]:
+            - /url: https://www.douyin.com/aisearch?from_nav=1
+          - link "关注" [ref=f1e41] [cursor=pointer]:
+            - /url: https://www.douyin.com/follow?from_nav=1
+          - link "朋友" [ref=f1e48] [cursor=pointer]:
+            - /url: https://www.douyin.com/friend?from_nav=1
+          - link "我的" [ref=f1e55] [cursor=pointer]:
+            - /url: https://www.douyin.com/user/self?from_nav=1
+          - link "直播" [ref=f1e63] [cursor=pointer]:
+            - /url: https://live.douyin.com/?from_nav=1
+          - link "放映厅" [ref=f1e70] [cursor=pointer]:
+            - /url: https://www.douyin.com/vs?from_nav=1
+          - link "短剧" [ref=f1e77] [cursor=pointer]:
+            - /url: https://www.douyin.com/series?from_nav=1
+        - generic [ref=f1e83]:
+          - generic [ref=f1e85] [cursor=pointer]
+          - generic [ref=f1e89] [cursor=pointer]
+          - generic [ref=f1e93] [cursor=pointer]
+    - generic [ref=f1e96]:
+      - banner [ref=f1e99]:
+        - generic [ref=f1e101]:
+          - generic [ref=f1e105]:
+            - textbox "搜索你感兴趣的内容" [ref=f1e107]
+            - button "搜索" [ref=f1e109] [cursor=pointer]
+          - generic [ref=f1e116]:
+            - paragraph [ref=f1e123] [cursor=pointer]: 充钻石
+            - link [ref=f1e128] [cursor=pointer]:
+              - /url: ""
+              - paragraph [ref=f1e136]: 客户端
+            - paragraph [ref=f1e143] [cursor=pointer]: 壁纸
+            - list [ref=f1e144]:
+              - paragraph [ref=f1e154] [cursor=pointer]: 通知
+            - list [ref=f1e155]:
+              - paragraph [ref=f1e162] [cursor=pointer]: 消息
+            - paragraph [ref=f1e171] [cursor=pointer]: 投稿
+            - button [ref=f1e175] [cursor=pointer]:
+              - paragraph [ref=f1e180]: 登录
+      - generic [ref=f1e184]:
+        - tablist [ref=f1e185]:
+          - tab "全部" [selected] [ref=f1e186]
+          - tab "公开课" [ref=f1e187] [cursor=pointer]
+          - tab "游戏" [ref=f1e188] [cursor=pointer]
+          - tab "二次元" [ref=f1e189] [cursor=pointer]
+          - tab "音乐" [ref=f1e190] [cursor=pointer]
+          - tab "影视" [ref=f1e191] [cursor=pointer]
+          - tab "美食" [ref=f1e192] [cursor=pointer]
+          - tab "知识" [ref=f1e193] [cursor=pointer]
+          - tab "小剧场" [ref=f1e194] [cursor=pointer]
+          - tab "生活vlog" [ref=f1e195] [cursor=pointer]
+          - tab "体育" [ref=f1e196] [cursor=pointer]
+          - tab "旅行" [ref=f1e197] [cursor=pointer]
+          - tab "亲子" [ref=f1e198] [cursor=pointer]
+          - tab "动物" [ref=f1e199] [cursor=pointer]
+          - tab "三农" [ref=f1e200] [cursor=pointer]
+          - tab "汽车" [ref=f1e201] [cursor=pointer]
+          - tab "美妆穿搭" [ref=f1e202] [cursor=pointer]
+        - tabpanel "全部" [ref=f1e204]:
+          - generic [ref=f1e210]:
+            - generic [ref=f1e213] [cursor=pointer]:
+              - generic [ref=f1e215]:
+                - 'img "当你在2026年再次听到这首歌（第5集）#ladygaga #pokerface #高中生" [ref=f1e217]'
+                - generic [ref=f1e220]:
+                  - generic [ref=f1e221]: 01:06
+                  - generic [ref=f1e222]: 795.1万
+              - generic [ref=f1e228]:
+                - generic [ref=f1e229]: "当你在2026年再次听到这首歌（第5集）#ladygaga #pokerface #高中生"
+                - generic [ref=f1e231]:
+                  - generic [ref=f1e232]: "@拉小提琴的王主任🎻"
+                  - generic [ref=f1e233]: · 9月17日
+            - generic [ref=f1e236] [cursor=pointer]:
+              - generic [ref=f1e238]:
+                - 'img "我复刻了中国34个省份的早餐 #美食复刻 #美食科普 #早餐" [ref=f1e240]'
+                - generic [ref=f1e243]:
+                  - generic [ref=f1e244]: 44:57
+                  - generic [ref=f1e245]: 7.6万
+              - generic [ref=f1e251]:
+                - generic [ref=f1e252]: "我复刻了中国34个省份的早餐 #美食复刻 #美食科普 #早餐"
+                - generic [ref=f1e254]:
+                  - generic [ref=f1e255]: "@笨猪不笨"
+                  - generic [ref=f1e256]: · 1天前
+            - generic [ref=f1e259] [cursor=pointer]:
+              - generic [ref=f1e261]:
+                - 'img "《狂飙》深度解析第89集：内鬼落网，靠山倒戈！走投无路的高启强即将展开最疯狂的反扑！#狂飙 #高启强 #影视解说 #了不起精讲团" [ref=f1e263]'
+                - generic [ref=f1e266]:
+                  - generic [ref=f1e267]: 09:24
+                  - generic [ref=f1e268]: 4.1万
+              - generic [ref=f1e274]:
+                - generic [ref=f1e275]: "《狂飙》深度解析第89集：内鬼落网，靠山倒戈！走投无路的高启强即将展开最疯狂的反扑！#狂飙 #高启强 #影视解说 #了不起精讲团"
+                - generic [ref=f1e277]:
+                  - generic [ref=f1e278]: "@迷惑桃"
+                  - generic [ref=f1e279]: · 8月10日
+            - generic [ref=f1e282] [cursor=pointer]:
+              - generic [ref=f1e284]:
+                - 'img "全网最强AI西游记 这次毒舌电影与@时间捡史 合作，是对电影叙事可能的又一探索，也希望在AI浪潮中，能帮助更多的创作者实现电影梦。#抖音AI创作大赛 #开放赛道 @时间捡史 团队以一位去过A类电影节的导演为核心，加上两位刚毕业的妹子，三人肝了两个月，做出的这条四十分钟西游长片。每个镜头都精心设计与打磨，每个镜头提示词长达几千字。虽然并不完美，但成果有目共睹。后续西游记的更新，也将会在他们的帐号继续。 欢迎关注AIGC的朋友一起来毒舌电影讨论，也欢迎在后台给我们发你的AI作品。毒舌电影会一如即往，对好片进行推荐，讲述精彩的人生故事。" [ref=f1e286]'
+                - generic [ref=f1e289]:
+                  - generic [ref=f1e290]: 41:59
+                  - generic [ref=f1e291]: 94.0万
+              - generic [ref=f1e297]:
+                - generic [ref=f1e298]: "全网最强AI西游记 这次毒舌电影与@时间捡史 合作，是对电影叙事可能的又一探索，也希望在AI浪潮中，能帮助更多的创作者实现电影梦。#抖音AI创作大赛 #开放赛道 @时间捡史 团队以一位去过A类电影节的导演为核心，加上两位刚毕业的妹子，三人肝了两个月，做出的这条四十分钟西游长片。每个镜头都精心设计与打磨，每个镜头提示词长达几千字。虽然并不完美，但成果有目共睹。后续西游记的更新，也将会在他们的帐号继续。 欢迎关注AIGC的朋友一起来毒舌电影讨论，也欢迎在后台给我们发你的AI作品。毒舌电影会一如即往，对好片进行推荐，讲述精彩的人生故事。"
+                - generic [ref=f1e300]:
+                  - generic [ref=f1e301]: "@毒舌电影"
+                  - generic [ref=f1e302]: · 7月24日
+            - generic [ref=f1e305] [cursor=pointer]:
+              - generic [ref=f1e307]:
+                - 'img "纪录片-《龙哥》 片长40分钟。没有简单的审判，只留下人性的复杂，供观者自省。#抖音精选APP征稿中 #影视补全计划 #了不起的精讲团 #纪录片 #抖音精选" [ref=f1e309]'
+                - generic [ref=f1e312]:
+                  - generic [ref=f1e313]: 42:12
+                  - generic [ref=f1e314]: "8053"
+              - generic [ref=f1e320]:
+                - generic [ref=f1e321]: "纪录片-《龙哥》 片长40分钟。没有简单的审判，只留下人性的复杂，供观者自省。#抖音精选APP征稿中 #影视补全计划 #了不起的精讲团 #纪录片 #抖音精选"
+                - generic [ref=f1e323]:
+                  - generic [ref=f1e324]: "@知乎狗也（比熊.西高地）"
+                  - generic [ref=f1e325]: · 13小时前
+            - generic [ref=f1e328] [cursor=pointer]:
+              - generic [ref=f1e330]:
+                - 'img "当你回到了远古的石炭纪，那会有怎样的奇遇？ #LibTV #LibTV创作者成长计划 #回到远古 #史前大逃亡 #石炭纪" [ref=f1e332]'
+                - generic [ref=f1e335]:
+                  - generic [ref=f1e336]: 05:21
+                  - generic [ref=f1e337]: 4.2万
+              - generic [ref=f1e343]:
+                - generic [ref=f1e344]: "当你回到了远古的石炭纪，那会有怎样的奇遇？ #LibTV #LibTV创作者成长计划 #回到远古 #史前大逃亡 #石炭纪"
+                - generic [ref=f1e346]:
+                  - generic [ref=f1e347]: "@酷哥看世界"
+                  - generic [ref=f1e348]: · 9月11日
+            - generic [ref=f1e351] [cursor=pointer]:
+              - generic [ref=f1e353]:
+                - 'img "体验菲律宾二手炸鸡！看到了菲律宾最真实的另一面！ #环球旅行 #勇闯东南亚 #菲律宾 #交换世界计划 #超会玩派对" [ref=f1e355]'
+                - generic [ref=f1e358]:
+                  - generic [ref=f1e359]: 45:21
+                  - generic [ref=f1e360]: 69.2万
+              - generic [ref=f1e366]:
+                - generic [ref=f1e367]: "体验菲律宾二手炸鸡！看到了菲律宾最真实的另一面！ #环球旅行 #勇闯东南亚 #菲律宾 #交换世界计划 #超会玩派对"
+                - generic [ref=f1e369]:
+                  - generic [ref=f1e370]: "@海风环球旅行"
+                  - generic [ref=f1e371]: · 8月6日
+            - generic [ref=f1e374] [cursor=pointer]:
+              - generic [ref=f1e376]:
+                - 'img "历经四年跟踪拍摄，饱经磨难的小狮子奇欧终于成为狮王 #动物世界 #狮子 #奇欧 #动物纪录片 #动物解说" [ref=f1e378]'
+                - generic [ref=f1e381]:
+                  - generic [ref=f1e382]: 44:15
+                  - generic [ref=f1e383]: 7.4万
+              - generic [ref=f1e389]:
+                - generic [ref=f1e390]: "历经四年跟踪拍摄，饱经磨难的小狮子奇欧终于成为狮王 #动物世界 #狮子 #奇欧 #动物纪录片 #动物解说"
+                - generic [ref=f1e392]:
+                  - generic [ref=f1e393]: "@星球奇观"
+                  - generic [ref=f1e394]: · 9月24日
+            - generic [ref=f1e397] [cursor=pointer]:
+              - generic [ref=f1e399]:
+                - 'img "知否放大镜113 | 此心安处是吾乡 #知否知否应是绿肥红瘦 #知否知否 #知否 #知否放大镜 #飞奔啊蜗牛" [ref=f1e401]'
+                - generic [ref=f1e404]:
+                  - generic [ref=f1e405]: 42:12
+                  - generic [ref=f1e406]: 2.1万
+              - generic [ref=f1e412]:
+                - generic [ref=f1e413]: "知否放大镜113 | 此心安处是吾乡 #知否知否应是绿肥红瘦 #知否知否 #知否 #知否放大镜 #飞奔啊蜗牛"
+                - generic [ref=f1e415]:
+                  - generic [ref=f1e416]: "@飞奔啊蜗牛"
+                  - generic [ref=f1e417]: · 6天前
+            - generic [ref=f1e420] [cursor=pointer]:
+              - generic [ref=f1e422]:
+                - 'img "日本仙台180分钟上（采耳） #日本 #仙台 #采耳 #头疗 #身体护理" [ref=f1e424]'
+                - generic [ref=f1e427]:
+                  - generic [ref=f1e428]: 40:56
+                  - generic [ref=f1e429]: 12.0万
+              - generic [ref=f1e435]:
+                - generic [ref=f1e436]: "日本仙台180分钟上（采耳） #日本 #仙台 #采耳 #头疗 #身体护理"
+                - generic [ref=f1e438]:
+                  - generic [ref=f1e439]: "@李乐奇遇记"
+                  - generic [ref=f1e440]: · 2天前

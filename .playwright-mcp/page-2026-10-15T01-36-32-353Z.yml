@@ -1,0 +1,103 @@
+- generic [active] [ref=e1]:
+  - button "开启读屏标签" [ref=e2]
+  - generic: 读屏标签已关闭
+  - generic [ref=e4]:
+    - generic [ref=e6]:
+      - link [ref=e7] [cursor=pointer]:
+        - /url: //www.douyin.com/jingxuan
+      - generic [ref=e13]:
+        - generic [ref=e15]:
+          - link "精选" [ref=e19] [cursor=pointer]:
+            - /url: https://www.douyin.com/jingxuan?from_nav=1
+          - link "推荐" [ref=e26] [cursor=pointer]:
+            - /url: https://www.douyin.com/?recommend=1&from_nav=1
+          - link "AI抖音" [ref=e33] [cursor=pointer]:
+            - /url: https://www.douyin.com/aisearch?from_nav=1
+          - link "关注" [ref=e41] [cursor=pointer]:
+            - /url: https://www.douyin.com/follow?from_nav=1
+          - link "朋友" [ref=e48] [cursor=pointer]:
+            - /url: https://www.douyin.com/friend?from_nav=1
+          - link "我的" [ref=e55] [cursor=pointer]:
+            - /url: https://www.douyin.com/user/self?from_nav=1
+          - link "直播" [ref=e63] [cursor=pointer]:
+            - /url: https://live.douyin.com/?from_nav=1
+          - link "放映厅" [ref=e70] [cursor=pointer]:
+            - /url: https://www.douyin.com/vs?from_nav=1
+          - link "短剧" [ref=e77] [cursor=pointer]:
+            - /url: https://www.douyin.com/series?from_nav=1
+        - generic [ref=e83]:
+          - generic [ref=e85] [cursor=pointer]
+          - generic [ref=e89] [cursor=pointer]
+          - generic [ref=e93] [cursor=pointer]
+    - generic [ref=e96]:
+      - banner [ref=e100]:
+        - generic [ref=e102]:
+          - generic [ref=e106]:
+            - textbox "搜索你感兴趣的内容" [ref=e108]: IT界牛马圣体
+            - button "搜索" [ref=e110] [cursor=pointer]
+          - generic [ref=e117]:
+            - paragraph [ref=e124] [cursor=pointer]: 充值
+            - link [ref=e129] [cursor=pointer]:
+              - /url: ""
+              - paragraph [ref=e137]: 客户端
+            - paragraph [ref=e144] [cursor=pointer]: 壁纸
+            - list [ref=e145]:
+              - paragraph [ref=e155] [cursor=pointer]: 通知
+            - list [ref=e156]:
+              - paragraph [ref=e163] [cursor=pointer]: 消息
+            - paragraph [ref=e172] [cursor=pointer]: 投稿
+            - button [ref=e176] [cursor=pointer]:
+              - paragraph [ref=e178]: 登录
+      - generic [ref=e185]:
+        - generic [ref=e189]:
+          - generic [ref=e190] [cursor=pointer]: 综合
+          - generic [ref=e191] [cursor=pointer]: 视频
+          - generic [ref=e192] [cursor=pointer]: 用户
+          - generic [ref=e193] [cursor=pointer]: 直播
+        - list [ref=e196]:
+          - listitem [ref=e197]
+          - listitem [ref=e206]
+          - listitem [ref=e215]
+          - listitem [ref=e224]
+          - listitem [ref=e233]
+          - listitem [ref=e242]
+          - listitem [ref=e251]
+          - listitem [ref=e260]
+          - listitem [ref=e269]
+          - listitem [ref=e278]
+          - listitem [ref=e287]
+          - listitem [ref=e296]
+          - listitem [ref=e305]
+          - listitem [ref=e314]
+          - listitem [ref=e323]
+          - listitem [ref=e332]
+  - article [ref=e350]:
+    - generic [ref=e353]:
+      - generic [ref=e354]: 登录后即可搜索更多精彩视频
+      - generic [ref=e357]:
+        - generic [ref=e360]:
+          - generic [ref=e361] [cursor=pointer]: 扫码登录
+          - generic [ref=e366]:
+            - generic [ref=e367]: 如何扫码
+            - paragraph [ref=e387]:
+              - paragraph [ref=e388]: 打开「抖音APP」点击左上角
+              - paragraph [ref=e395]: 扫一扫
+        - generic [ref=e398]:
+          - generic [ref=e399] [cursor=pointer]:
+            - generic [ref=e400]: 验证码登录
+            - generic [ref=e403]: 密码登录
+          - generic [ref=e407]:
+            - generic [ref=e409]:
+              - combobox "国家/地区" [ref=e412]: "+86"
+              - textbox "请输入手机号" [ref=e416]
+            - generic [ref=e418]:
+              - textbox "请输入验证码" [ref=e420]
+              - generic [ref=e421]: 获取验证码
+            - generic [ref=e423]: 登录
+            - generic "登录即代表同意用户协议和隐私政策" [ref=e426]:
+              - text: 登录即代表同意
+              - link "用户协议" [ref=e427] [cursor=pointer]:
+                - /url: https://www.douyin.com/agreements/?id=6773906068725565448
+              - text: 和
+              - link "隐私政策" [ref=e428] [cursor=pointer]:
+                - /url: https://www.douyin.com/agreements/?id=6773901168964798477
