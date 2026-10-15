@@ -1,0 +1,53 @@
+- generic [active] [ref=f1e1]:
+  - button "开启读屏标签" [ref=f1e2]
+  - generic: 读屏标签已关闭
+  - generic [ref=f1e4]:
+    - generic [ref=f1e6]:
+      - link [ref=f1e7] [cursor=pointer]:
+        - /url: //www.douyin.com/jingxuan
+      - generic [ref=f1e13]:
+        - generic [ref=f1e15]:
+          - link "精选" [ref=f1e19] [cursor=pointer]:
+            - /url: https://www.douyin.com/jingxuan?from_nav=1
+          - link "推荐" [ref=f1e26] [cursor=pointer]:
+            - /url: https://www.douyin.com/?recommend=1&from_nav=1
+          - link "AI抖音" [ref=f1e33] [cursor=pointer]:
+            - /url: https://www.douyin.com/aisearch?from_nav=1
+          - link "关注" [ref=f1e41] [cursor=pointer]:
+            - /url: https://www.douyin.com/follow?from_nav=1
+          - link "朋友" [ref=f1e48] [cursor=pointer]:
+            - /url: https://www.douyin.com/friend?from_nav=1
+          - link "我的" [ref=f1e55] [cursor=pointer]:
+            - /url: https://www.douyin.com/user/self?from_nav=1
+          - link "直播" [ref=f1e63] [cursor=pointer]:
+            - /url: https://live.douyin.com/?from_nav=1
+          - link "放映厅" [ref=f1e70] [cursor=pointer]:
+            - /url: https://www.douyin.com/vs?from_nav=1
+          - link "短剧" [ref=f1e77] [cursor=pointer]:
+            - /url: https://www.douyin.com/series?from_nav=1
+        - generic [ref=f1e83]:
+          - generic [ref=f1e85] [cursor=pointer]
+          - generic [ref=f1e89] [cursor=pointer]
+          - generic [ref=f1e93] [cursor=pointer]
+    - generic [ref=f1e96]:
+      - banner [ref=f1e99]:
+        - generic [ref=f1e101]:
+          - generic [ref=f1e105]:
+            - textbox "搜索你感兴趣的内容" [ref=f1e107]
+            - button "搜索" [ref=f1e109] [cursor=pointer]
+          - generic [ref=f1e116]:
+            - paragraph [ref=f1e123] [cursor=pointer]: 充钻石
+            - link [ref=f1e128] [cursor=pointer]:
+              - /url: ""
+              - paragraph [ref=f1e136]: 客户端
+            - paragraph [ref=f1e143] [cursor=pointer]: 壁纸
+            - list [ref=f1e144]:
+              - paragraph [ref=f1e154] [cursor=pointer]: 通知
+            - list [ref=f1e155]:
+              - paragraph [ref=f1e162] [cursor=pointer]: 消息
+            - paragraph [ref=f1e171] [cursor=pointer]: 投稿
+            - button [ref=f1e175] [cursor=pointer]:
+              - paragraph [ref=f1e177]: 登录
+      - generic [ref=f1e182]:
+        - generic [ref=f1e183]: 视频数据加载中
+        - contentinfo [ref=f1e187]
