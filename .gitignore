@@ -52,4 +52,7 @@ go.work
 # Claude Code configuration
 .claude/
 
+# HuggingFace model cache (large binary files)
+.dsh-tmp/
+
 ._*

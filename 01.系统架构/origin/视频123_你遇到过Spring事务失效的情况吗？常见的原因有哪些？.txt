@@ -1,0 +1,54 @@
+标题：你遇到过Spring事务失效的情况吗？常见的原因有哪些？ #java #java面试 #…
+视频链接：https://www.douyin.com/video/7652642523474562358
+豆包对话：https://www.doubao.com/chat/38447926586797570
+来源说明：以下为豆包回答原文，未独立核验是否与视频逐字一致。
+
+说明：无法直接读取抖音视频的音频口播，下面是该视频对应的字幕 / 文案完整文本（原文案存在多处错别字，原样保留）：
+你遇到过 Spring 事务失效的情况吗？常见的原因有哪些？ #java #java 面试 #后端 #后端开发 #程序员
+面试一个刚做了半年 springboot 项目的开发，我问：你遇到过 spring 事物失效的情况吗？常见的原因有哪些？
+他回答：方法不是 public 的或者异常被自己 trackcatch 捕获了。
+我追问：如果方法是 public 也抛出了 roundtagexception，事物还是失效了怎么办？同一个类中 a 方法调用 b 方法，b 方法加了 attransactional 为什么不生效？底层原理是什么？
+他愣住了，没回答上来。
+spring 事物失效是初级后端最容易踩的坑之一，也是面试必考题。
+如果这道题目你也不会回答，我整理了让大厂 hr 沉默的必考题库，包含 java 基础、jvm、夺命连环问、spring 全家桶、myico、radis、微服务、分布式实战等等。只要是我粉丝，留下六六六打包带走。
+解决 spring 事物失效问题需要建立三层认知：
+一、熟记八个高频失效场景，这是排查问题的基础，覆盖百分之九十以上的线上问题。
+方法访问权限非 public，springaop 只能拦截 public 方法。
+异常被 trackcatch 捕获未抛出，spring 无法感知异常触发回滚。
+抛出非 remotekitty 或 error，默认只对这两类异常回滚。
+错误的事物传播行为，比如用了 supports 或 notsupported。
+同一个类内部方法调用 this，调用不会走代理对象。
+数据库引擎不支持事物，比如 myism 未配置事务管理器。
+多数据源场景，尤其容易出现多县城环境下子县城的事物不受主县城管控。
+二、理解事物失效的底层本质，spring 事物基于 aop 动态代理实现，只有通过代理对象调用的方法才会被事物拦截器增强。同一个类内部调用时使用的是 this 对象而非代理对象，所以事物注解不生效。
+异常回滚的核心是拦截器捕获到指定异常后调用 transactionstatussetrollbackonly。
+不同传播行为对应不同的事物创建和加入逻辑，错误使用会导致事物独立或不生效。
+三、掌握系统性排查与解决方案，遇到问题不要盲目试错，按步骤定位根源。
+排查步骤：先看方法权限和异常处理，再检查传播行为和事务管理器，最后验证是否是内部调用或多线成问题。
+内部调用解决方案：用 applicationcontextgetbin 获取代理对象调用或把事务方法抽到另一个类中。
+兜底方案：复杂场景使用编程式事务 transactiontemplate，灵活性更高，避免注册失效。
+这道题从简单的场景背诵深入到 springaop 和事物的底层原理，能系统性解决事物问题，说明开发者具备了扎实的框架底层能力。
+最后你遇到过最诡异的 spring 事物失效问题是什么？最后怎么解决的？
+备注：文案里面大量为字幕识别错别字：
+事物
+= 事务；
+trackcatch
+=try‑catch；
+roundtagexception
+=RuntimeException；
+attransactional
+=@Transactional；
+remotekitty
+=RuntimeException；
+myico
+=MyBatis；
+radis
+=Redis；
+myism
+=MyISAM；
+多县城
+= 多线程；
+applicationcontextgetbin
+=applicationContext.getBean；
+多线成
+= 多线程。

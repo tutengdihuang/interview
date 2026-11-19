@@ -1,0 +1,31 @@
+标题：面试官问： String、StringBuffer 、StringBuilder 区别是…
+视频链接：https://www.douyin.com/video/7628947499952196891
+豆包对话：https://www.doubao.com/chat/38448158899905026
+来源说明：以下为豆包回答原文，未独立核验是否与视频逐字一致。
+
+说明：无法直接读取抖音视频链接的音视频流，不能自动提取视频内的口播音频与字幕；下面是该视频对应的文稿（页面抓取到的字幕 / 口播文字内容，保留原文问答形式）：
+面试官问：String、StringBuffer 、StringBuilder 区别是什么？
+#后端开发 #java 面试 #面试 #面试题 #后端工程师
+你说你会后端，那 String、StringBuffer、StringBuilder 区别是什么？
+最近面试了一个后端工程师，我问：String、StringBuffer、StringBuilder 底层原理和使用场景有什么区别？
+他说：都是字符串，随便用就行。
+我追问：线程安全吗？可变不可变？效率谁高谁低？为什么高频拼接不能用 String？
+假如你对这道题目也不会回答，我整理了让面试官沉默的大厂必考题库，包含：JVM 夺命连环问、Spring 灵魂八股、高并发必杀场景、Redis 深度陷阱等等。
+这道题该如何回答才能让面试官哑口无言？接下来带大家一一解析。
+字符串类使用必须遵循不可变性、线程安全、执行效率三大原则，是 Java 基础必考核心。
+方案一：底层特性区分。
+String 是不可变字符串，底层 final 修饰，每次修改都会新建对象；StringBuffer、StringBuilder 是可变字符数组，直接在原对象操作。
+方案二：线程安全对比。
+StringBuffer 方法加 synchronized 锁，线程安全；StringBuilder 无锁，线程不安全。
+方案三：执行效率排序。
+StringBuilder>StringBuffer>String，单线程优先用 StringBuilder，多线程用 StringBuffer。
+方案四：使用场景总结。
+少量赋值用 String；高频拼接、循环拼接用 StringBuilder；多线程共享变量用 StringBuffer。
+方案五：内存与 GC 关键点。
+String 频繁拼接产生大量临时对象，容易造成内存浪费、GC 压力大，严禁在循环内使用 + 拼接。
+一个核心原则：字符串拼接不是想怎么用就怎么用，而是按场景选型、兼顾效率与安全，禁止循环内使用 String 拼接，避免线上性能问题。
+这道题考的是 Java 基础与性能优化思维，字符串使用直接影响接口效率，细节决定后端代码质量。
+最后你们项目里字符串拼接一般用哪个？踩过什么坑？一起来聊一聊。
+补充：如果你需要
+真正视频里的逐帧字幕（带时间轴 SRT）
+，需要下载该抖音视频文件后做语音转文字，我可以帮你把视频文件转成带时间轴的字幕文本。
